@@ -10,6 +10,31 @@ cookies_*.txt
 # Logs
 *.log
 
+# Ambiente e credenciais
+.env
+.env.*
+*.env
+config.local.php
+config.production.php
+
+# Chaves e certificados
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+*.jks
+
+# SSH
+id_rsa
+id_rsa.pub
+*.ppk
+
+# Tokens e secrets
+*.token
+*secret*
+*credentials*
+
 # IDE
 .vscode/
 .idea/
