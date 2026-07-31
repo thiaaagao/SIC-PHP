@@ -26,13 +26,22 @@ class RateLimit
             return true;
         }
 
-        $data = json_decode(file_get_contents($file), true);
+        $fp = fopen($file, 'c+');
+        if (!$fp) return true;
+
+        flock($fp, LOCK_EX);
+        $data = json_decode(stream_get_contents($fp), true);
         if (!is_array($data)) {
-            return true;
+            $data = ['attempts' => []];
         }
 
         $data['attempts'] = array_filter($data['attempts'], fn($ts) => $ts > $now - $windowSeconds);
-        file_put_contents($file, json_encode($data));
+
+        ftruncate($fp, 0);
+        rewind($fp);
+        fwrite($fp, json_encode($data));
+        flock($fp, LOCK_UN);
+        fclose($fp);
 
         return count($data['attempts']) < $maxAttempts;
     }
@@ -43,20 +52,26 @@ class RateLimit
         $file = self::getKey($key);
         $now = time();
 
-        $data = ['attempts' => []];
-        if (file_exists($file)) {
-            $data = json_decode(file_get_contents($file), true) ?? $data;
-        }
+        $fp = fopen($file, 'c+');
+        if (!$fp) return;
+
+        flock($fp, LOCK_EX);
+        $data = json_decode(stream_get_contents($fp), true) ?? ['attempts' => []];
 
         $data['attempts'][] = $now;
-        file_put_contents($file, json_encode($data));
+
+        ftruncate($fp, 0);
+        rewind($fp);
+        fwrite($fp, json_encode($data));
+        flock($fp, LOCK_UN);
+        fclose($fp);
     }
 
     public static function clear(string $key): void
     {
         $file = self::getKey($key);
         if (file_exists($file)) {
-            unlink($file);
+            @unlink($file);
         }
     }
 }

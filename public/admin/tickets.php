@@ -94,7 +94,7 @@ $statuses = ['open', 'in_progress', 'resolved', 'closed'];
         <a href="index.php" class="btn btn-outline-secondary btn-sm mb-3">&larr; Voltar</a>
         <h4 class="mb-3">Gerenciar Tickets</h4>
 
-        <?php if ($msg): ?><div class="alert alert-<?= $msgType ?> py-2"><?= $msg ?></div><?php endif ?>
+        <?php if ($msg): ?><div class="alert alert-<?= $msgType ?> py-2"><?= htmlspecialchars($msg) ?></div><?php endif ?>
 
         <form method="get" class="row g-2 mb-3">
             <div class="col-md-6">

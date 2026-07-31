@@ -9,10 +9,16 @@ logAccess();
 Auth::requireMinLevel('admin');
 
 $db = Database::getInstance();
-$userId = (int) ($_GET['id'] ?? 0);
-$confirm = $_GET['confirm'] ?? '';
+$currentUser = Auth::getUser();
 
-if (!$userId || $confirm !== 'yes') {
+if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !Auth::validateCsrf()) {
+    header('Location: users.php');
+    exit;
+}
+
+$userId = (int) ($_POST['user_id'] ?? 0);
+
+if (!$userId || $userId === $currentUser['id']) {
     header('Location: users.php');
     exit;
 }
@@ -27,7 +33,7 @@ if (!$userToDelete) {
 }
 
 if ($userToDelete['role'] === 'admin') {
-    header('Location: users.php?msg=cannot_delete_admin');
+    header('Location: users.php');
     exit;
 }
 
@@ -51,10 +57,10 @@ try {
 
     AuditLog::log('user_delete', 'user', $userId, "Usuario {$userToDelete['name']} anonimizado (LGPD)");
 
-    header('Location: users.php?msg=deleted');
+    header('Location: users.php');
     exit;
 } catch (Exception $e) {
     $db->rollBack();
-    header('Location: users.php?msg=error');
+    header('Location: users.php');
     exit;
 }

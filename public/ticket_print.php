@@ -4,7 +4,7 @@ require_once __DIR__ . '/../src/Database.php';
 require_once __DIR__ . '/../src/Auth.php';
 
 session_start();
-Auth::requireAccess();
+Auth::requireMinLevel('encarregado');
 
 $db = Database::getInstance();
 $id = (int) ($_GET['id'] ?? 0);

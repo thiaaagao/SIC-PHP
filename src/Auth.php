@@ -78,6 +78,8 @@ class Auth
         $db->prepare("UPDATE users SET failed_attempts = 0, locked_until = NULL WHERE id = ?")
             ->execute([$user['id']]);
 
+        session_regenerate_id(true);
+
         $_SESSION['user'] = [
             'id' => $user['id'],
             'username' => $user['username'],
@@ -86,6 +88,24 @@ class Auth
             'force_password_change' => $user['force_password_change'],
         ];
         return true;
+    }
+
+    public static function validatePassword(string $password): array
+    {
+        $errors = [];
+        if (strlen($password) < 6) {
+            $errors[] = 'Minimo 6 caracteres';
+        }
+        if (!preg_match('/[A-Z]/', $password)) {
+            $errors[] = 'Pelo menos 1 letra maiuscula';
+        }
+        if (!preg_match('/[a-z]/', $password)) {
+            $errors[] = 'Pelo menos 1 letra minuscula';
+        }
+        if (!preg_match('/[0-9]/', $password)) {
+            $errors[] = 'Pelo menos 1 numero';
+        }
+        return $errors;
     }
 
     public static function isLoggedIn(): bool
@@ -122,6 +142,10 @@ class Auth
         }
         if (!self::checkSessionTimeout()) {
             header('Location: login.php?timeout=1');
+            exit;
+        }
+        if (self::mustChangePassword() && basename($_SERVER['SCRIPT_FILENAME'] ?? '') !== 'change_password.php') {
+            header('Location: change_password.php');
             exit;
         }
     }

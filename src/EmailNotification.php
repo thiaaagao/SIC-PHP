@@ -15,10 +15,16 @@ class EmailNotification
 
     private static function send(string $to, string $subject, string $body): bool
     {
+        $safeSubject = preg_replace('/[\r\n]/', '', $subject);
         $headers = "From: S.I.C. <noreply@sistema.com.br>\r\n";
         $headers .= "MIME-Version: 1.0\r\n";
         $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
-        return @mail($to, $subject, $body, $headers);
+        return @mail($to, $safeSubject, $body, $headers);
+    }
+
+    private static function e(string $str): string
+    {
+        return htmlspecialchars($str, ENT_QUOTES, 'UTF-8');
     }
 
     public static function notifyNewTicket(array $ticket): void
@@ -26,15 +32,15 @@ class EmailNotification
         $emails = self::getAdminEmails();
         if (!$emails) return;
 
-        $subject = "[P.S.] Novo chamado {$ticket['code']}";
+        $subject = "[S.I.C.] Novo chamado " . self::e($ticket['code'] ?? '');
         $body = "
         <h3>Novo chamado aberto</h3>
-        <p><strong>Codigo:</strong> {$ticket['code']}</p>
-        <p><strong>Solicitante:</strong> {$ticket['requester_name']}</p>
-        <p><strong>Categoria:</strong> {$ticket['subcategory']}</p>
-        <p><strong>Prioridade:</strong> {$ticket['priority']}</p>
-        <p><strong>Descricao:</strong> {$ticket['description']}</p>
-        <p><a href='" . BASE_URL . "/ticket.php?id={$ticket['id']}'>Ver chamado</a></p>";
+        <p><strong>Codigo:</strong> " . self::e($ticket['code'] ?? '') . "</p>
+        <p><strong>Solicitante:</strong> " . self::e($ticket['requester_name'] ?? '') . "</p>
+        <p><strong>Categoria:</strong> " . self::e($ticket['subcategory'] ?? '') . "</p>
+        <p><strong>Prioridade:</strong> " . self::e($ticket['priority'] ?? '') . "</p>
+        <p><strong>Descricao:</strong> " . self::e($ticket['description'] ?? '') . "</p>
+        <p><a href='" . BASE_URL . "/ticket.php?id=" . (int)($ticket['id'] ?? 0) . "'>Ver chamado</a></p>";
 
         foreach ($emails as $email) {
             self::send($email, $subject, $body);
@@ -45,13 +51,13 @@ class EmailNotification
     {
         if (!$assigneeEmail) return;
 
-        $subject = "[P.S.] Chamado {$ticket['code']} atribuido a voce";
+        $subject = "[S.I.C.] Chamado " . self::e($ticket['code'] ?? '') . " atribuido a voce";
         $body = "
         <h3>Chamado atribuido</h3>
-        <p>O chamado <strong>{$ticket['code']}</strong> foi atribuido a voce.</p>
-        <p><strong>Solicitante:</strong> {$ticket['requester_name']}</p>
-        <p><strong>Problema:</strong> {$ticket['description']}</p>
-        <p><a href='" . BASE_URL . "/ticket.php?id={$ticket['id']}'>Ver chamado</a></p>";
+        <p>O chamado <strong>" . self::e($ticket['code'] ?? '') . "</strong> foi atribuido a voce.</p>
+        <p><strong>Solicitante:</strong> " . self::e($ticket['requester_name'] ?? '') . "</p>
+        <p><strong>Problema:</strong> " . self::e($ticket['description'] ?? '') . "</p>
+        <p><a href='" . BASE_URL . "/ticket.php?id=" . (int)($ticket['id'] ?? 0) . "'>Ver chamado</a></p>";
 
         self::send($assigneeEmail, $subject, $body);
     }
@@ -61,12 +67,12 @@ class EmailNotification
         $emails = self::getAdminEmails();
         if (!$emails) return;
 
-        $subject = "[P.S.] Chamado {$ticket['code']} resolvido";
+        $subject = "[S.I.C.] Chamado " . self::e($ticket['code'] ?? '') . " resolvido";
         $body = "
         <h3>Chamado resolvido</h3>
-        <p>O chamado <strong>{$ticket['code']}</strong> foi resolvido por {$resolverName}.</p>
-        <p><strong>Solicitante:</strong> {$ticket['requester_name']}</p>
-        <p><a href='" . BASE_URL . "/ticket.php?id={$ticket['id']}'>Ver chamado</a></p>";
+        <p>O chamado <strong>" . self::e($ticket['code'] ?? '') . "</strong> foi resolvido por " . self::e($resolverName) . ".</p>
+        <p><strong>Solicitante:</strong> " . self::e($ticket['requester_name'] ?? '') . "</p>
+        <p><a href='" . BASE_URL . "/ticket.php?id=" . (int)($ticket['id'] ?? 0) . "'>Ver chamado</a></p>";
 
         foreach ($emails as $email) {
             self::send($email, $subject, $body);

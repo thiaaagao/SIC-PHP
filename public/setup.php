@@ -5,6 +5,7 @@ require_once __DIR__ . '/../src/Database.php';
 require_once __DIR__ . '/../src/Sector.php';
 
 session_start();
+Auth::requireMinLevel('admin');
 
 $checks = [];
 

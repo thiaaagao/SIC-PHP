@@ -4,7 +4,7 @@ class AuditLog
     public static function log(string $action, string $entityType, ?int $entityId = null, ?string $details = null): void
     {
         $db = Database::getInstance();
-        $userId = $_SESSION['user_id'] ?? null;
+        $userId = $_SESSION['user']['id'] ?? null;
         $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
         $stmt = $db->prepare("INSERT INTO audit_logs (user_id, action, entity_type, entity_id, details, ip) VALUES (?, ?, ?, ?, ?, ?)");
         $stmt->execute([$userId, $action, $entityType, $entityId, $details, $ip]);

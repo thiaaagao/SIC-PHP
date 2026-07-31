@@ -25,16 +25,25 @@ if (!$att) {
 }
 
 $user = Auth::getUser();
-if ($att['uploaded_by'] != $user['id'] && !Auth::canResolve()) {
+if (!$user || ($att['uploaded_by'] != $user['id'] && !Auth::canResolve())) {
     http_response_code(403);
     echo 'Acesso negado.';
     exit;
 }
 
-$filepath = __DIR__ . '/../storage/uploads/' . $att['filename'];
+$filename = basename($att['filename']);
+$filepath = __DIR__ . '/../storage/uploads/' . $filename;
 
-if (!file_exists($filepath)) {
+if ($filename !== $att['filename'] || !file_exists($filepath)) {
     header('Location: index.php');
+    exit;
+}
+
+$realPath = realpath($filepath);
+$uploadsDir = realpath(__DIR__ . '/../storage/uploads');
+if (!$realPath || !str_starts_with($realPath, $uploadsDir)) {
+    http_response_code(403);
+    echo 'Acesso negado.';
     exit;
 }
 

@@ -25,11 +25,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $role = $_POST['role'] ?? '';
 
             if ($username && $password && $name && in_array($role, ['admin', 'suporte_ti', 'encarregado'])) {
-                $hash = password_hash($password, PASSWORD_BCRYPT);
-                $st = $db->prepare("INSERT INTO users (username, password, name, role) VALUES (?, ?, ?, ?)");
-                $st->execute([$username, $hash, $name, $role]);
-                AuditLog::log('user_create', 'user', $db->lastInsertId(), "Usuario criado: $username");
-                $msg = "Usuario {$username} criado.";
+                $passErrors = Auth::validatePassword($password);
+                if ($passErrors) {
+                    $msg = 'Senha fraca: ' . implode(', ', $passErrors);
+                    $msgType = 'danger';
+                } else {
+                    $hash = password_hash($password, PASSWORD_BCRYPT);
+                    $st = $db->prepare("INSERT INTO users (username, password, name, role) VALUES (?, ?, ?, ?)");
+                    $st->execute([$username, $hash, $name, $role]);
+                    AuditLog::log('user_create', 'user', $db->lastInsertId(), "Usuario criado: $username");
+                    $msg = "Usuario {$username} criado.";
+                }
             } else { $msg = 'Preencha todos os campos.'; $msgType = 'danger'; }
         }
 
@@ -126,11 +132,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $id = (int)($_POST['user_id'] ?? 0);
             $newPass = $_POST['new_password'] ?? '';
             if ($id && $newPass) {
-                $hash = password_hash($newPass, PASSWORD_BCRYPT);
-                $st = $db->prepare("UPDATE users SET password = ?, force_password_change = 0 WHERE id = ?");
-                $st->execute([$hash, $id]);
-                AuditLog::log('user_password_reset', 'user', $id, "Senha redefinida");
-                $msg = 'Senha redefinida.';
+                $passErrors = Auth::validatePassword($newPass);
+                if ($passErrors) {
+                    $msg = 'Senha fraca: ' . implode(', ', $passErrors);
+                    $msgType = 'danger';
+                } else {
+                    $hash = password_hash($newPass, PASSWORD_BCRYPT);
+                    $st = $db->prepare("UPDATE users SET password = ?, force_password_change = 0 WHERE id = ?");
+                    $st->execute([$hash, $id]);
+                    AuditLog::log('user_password_reset', 'user', $id, "Senha redefinida");
+                    $msg = 'Senha redefinida.';
+                }
             }
         }
     }

@@ -242,7 +242,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     <select name="setor" class="form-select">
                                         <option value="">Selecione...</option>
                                         <?php foreach ($sectors as $s): ?>
-                                            <option value="<?= $s ?>" <?= ($_POST['setor'] ?? '') === $s ? 'selected' : '' ?>><?= $s ?></option>
+                                            <option value="<?= htmlspecialchars($s) ?>" <?= ($_POST['setor'] ?? '') === $s ? 'selected' : '' ?>><?= htmlspecialchars($s) ?></option>
                                         <?php endforeach ?>
                                     </select>
                                 </div>
