@@ -1,4 +1,4 @@
-# Sistema P.S. (Problem Solving) — Profarma
+# Sistema P.S. (Problem Solving) — S.I.C.
 
 ## Índice
 
@@ -18,7 +18,7 @@
 
 ## 1. Visão Geral
 
-Sistema interno para abertura, acompanhamento e resolução de chamados técnicos (Problem Solving) na Profarma.
+Sistema interno para abertura, acompanhamento e resolucao de chamados tecnicos (Problem Solving).
 
 **Stack:** PHP 8.2 + MariaDB/MySQL + Bootstrap 5  
 **Servidor:** Apache (XAMPP) — porta 8080  
@@ -319,4 +319,4 @@ C:\xampp\mysql\bin\mysql -u root < C:\Chamado-auto\ps-system\db\schema.sql
 
 ---
 
-*Documentação v2.0 — Julho/2026 — Sistema P.S. Profarma*
+*Documentacao v2.0 — Julho/2026 — Sistema S.I.C.*

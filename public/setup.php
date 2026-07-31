@@ -44,12 +44,12 @@ $checks['apache'] = ['status' => 'ok', 'msg' => 'Apache rodando na porta 8080'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Setup - P.S. Profarma</title>
+    <title>Setup - S.I.C.</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <div class="container py-5">
-        <h3 class="mb-4">Setup - P.S. Profarma</h3>
+        <h3 class="mb-4">Setup - S.I.C.</h3>
 
         <?php foreach ($checks as $key => $c): ?>
             <div class="alert alert-<?= $c['status'] === 'ok' ? 'success' : ($c['status'] === 'warning' ? 'warning' : 'danger') ?> py-2">

@@ -1,6 +1,6 @@
-# P.S. Profarma — Documentacao Completa do Sistema
+# S.I.C. — Documentacao Completa do Sistema
 
-> Sistema de Problem Solving para gestao de chamados de TI na Profarma.
+> Sistema de Problem Solving para gestao de chamados de TI.
 > Versao: 2.0 | Ultima atualizacao: Julho 2026
 
 ---
@@ -29,7 +29,7 @@
 
 ### O que e
 
-O P.S. Profarma e um sistema web interno para abertura, acompanhamento e resolucao de chamados de TI, seguindo boas praticas ITIL (Service Operation). Qualquer pessoa na rede da Profarma (visitante) ou usuario autenticado pode abrir um chamado.
+O S.I.C. e um sistema web interno para abertura, acompanhamento e resolucao de chamados de TI, seguindo boas praticas ITIL (Service Operation). Qualquer pessoa na rede (visitante) ou usuario autenticado pode abrir um chamado.
 
 ### Publico-alvo
 
@@ -847,7 +847,7 @@ GLPILookup::getHostnameByIp($ip)
 ```
 ┌──────────────────────────────────────────┐
 │  NAVBAR (cor = papel do usuario)         │
-│  P.S. Profarma    [Abrir] [Sair] [☀/☾] │
+│  P.S. S.I.C.    [Abrir] [Sair] [☀/☾] │
 ├──────────────────────────────────────────┤
 │  Resumo: [Abertos] [Andamento] [Resolv] │
 │                                          │
@@ -867,7 +867,7 @@ GLPILookup::getHostnameByIp($ip)
 ├──────────────────────────────────────────┤
 │                                          │
 │     ┌────────────────────────┐           │
-│     │     P.S. Profarma      │           │
+│     │     P.S. S.I.C.      │           │
 │     │   Acesse o sistema     │           │
 │     │                        │           │
 │     │  [Encarregado]         │           │
@@ -1095,7 +1095,7 @@ $user = Auth::getUser();
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pagina - P.S. Profarma</title>
+    <title>Pagina - S.I.C.</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="assets/theme.css">
     <script src="assets/theme.js"></script>
@@ -1103,7 +1103,7 @@ $user = Auth::getUser();
 <body>
     <nav class="navbar navbar-expand navbar-dark <?= Auth::navbarBg() ?>">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="index.php">P.S. Profarma</a>
+            <a class="navbar-brand fw-bold" href="index.php">S.I.C.</a>
             <div class="ms-auto d-flex align-items-center gap-2">
                 <a href="open_ticket.php" class="btn btn-outline-light btn-sm">Abrir P.S.</a>
                 <a href="logout.php" class="btn btn-outline-light btn-sm">Sair</a>
@@ -1212,4 +1212,4 @@ curl.exe -s -b cookies.txt -o NUL -w "%{http_code}" "http://localhost:8080/ps-sy
 ---
 
 *Documento gerado automaticamente em Julho de 2026.*
-*Sistema P.S. Profarma v2.0*
+*Sistema S.I.C. v2.0*

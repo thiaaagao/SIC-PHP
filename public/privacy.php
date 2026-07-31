@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Politica de Privacidade - P.S. Profarma</title>
+    <title>Politica de Privacidade - S.I.C.</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
     <nav class="navbar navbar-expand navbar-dark bg-secondary">
         <div class="container">
-            <a href="index.php" class="navbar-brand fw-bold">P.S. Profarma</a>
+            <a href="index.php" class="navbar-brand fw-bold">S.I.C.</a>
             <div class="ms-auto">
                 <a href="index.php" class="btn btn-outline-light btn-sm">Voltar</a>
             </div>
@@ -44,7 +44,7 @@
                 <h5>4. Compartilhamento</h5>
                 <p>Os dados podem ser compartilhados com:</p>
                 <ul>
-                    <li>Equipe de suporte TI da Profarma</li>
+                    <li>Equipe de suporte TI</li>
                     <li>Sistema GLPI (para consulta de hostname, quando necessario)</li>
                     <li>Microsoft Teams (notificacoes de chamados, via Power Automate)</li>
                 </ul>
@@ -71,7 +71,7 @@
                 </ul>
 
                 <h5>8. Contato</h5>
-                <p>Para exercer seus direitos ou esclarecer duvidas, entre em contato com a equipe de TI da Profarma.</p>
+                <p>Para exercer seus direitos ou esclarecer duvidas, entre em contato com a equipe de TI.</p>
 
                 <hr>
                 <p class="text-muted small">Ultima atualizacao: <?= date('d/m/Y') ?></p>

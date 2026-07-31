@@ -26,14 +26,14 @@ $usersByRole = $db->query("SELECT role, COUNT(*) as total FROM users GROUP BY ro
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - P.S. Profarma</title>
+    <title>Admin - S.I.C.</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="../assets/theme.css" rel="stylesheet">
 </head>
 <body>
     <nav class="navbar navbar-expand bg-dark navbar-dark">
         <div class="container">
-            <span class="navbar-brand fw-bold">Admin - P.S. Profarma<?= NavHelper::badge() ?></span>
+            <span class="navbar-brand fw-bold">Admin - S.I.C.<?= NavHelper::badge() ?></span>
             <div class="ms-auto d-flex gap-2 align-items-center">
                 <a href="../index.php" class="btn btn-outline-light btn-sm">Dashboard</a>
                 <a href="../support.php" class="btn btn-outline-light btn-sm">Suporte</a>

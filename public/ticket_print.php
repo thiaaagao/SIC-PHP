@@ -36,7 +36,7 @@ $statusLabel = ['open' => 'Aberto', 'in_progress' => 'Em Andamento', 'resolved' 
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title><?= htmlspecialchars($ticket['code']) ?> - P.S. Profarma</title>
+    <title><?= htmlspecialchars($ticket['code']) ?> - S.I.C.</title>
     <style>
         body { font-family: Arial, sans-serif; font-size: 12px; color: #333; margin: 20px; }
         h1 { font-size: 18px; border-bottom: 2px solid #333; padding-bottom: 6px; }
@@ -113,6 +113,6 @@ $statusLabel = ['open' => 'Aberto', 'in_progress' => 'Em Andamento', 'resolved' 
     <?php endif ?>
 
     <hr>
-    <small>Documento gerado em <?= date('d/m/Y H:i') ?> — P.S. Profarma</small>
+    <small>Documento gerado em <?= date('d/m/Y H:i') ?> — S.I.C.</small>
 </body>
 </html>

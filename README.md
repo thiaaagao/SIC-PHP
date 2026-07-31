@@ -1,4 +1,4 @@
-# S.I.C. - Sistema de Chamados Profarma
+# S.I.C. - Sistema de Informacao e Chamados
 
 Sistema web para abertura, acompanhamento e resolucao de chamados de TI, seguindo boas praticas ITIL.
 
@@ -281,4 +281,4 @@ curl.exe -s -c cookies.txt -b cookies.txt -d "username=admin&password=SENHA&csrf
 
 ## Licenca
 
-Uso interno - Profarma
+Uso interno

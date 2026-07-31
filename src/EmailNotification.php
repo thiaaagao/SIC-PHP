@@ -15,7 +15,7 @@ class EmailNotification
 
     private static function send(string $to, string $subject, string $body): bool
     {
-        $headers = "From: P.S. Profarma <noreply@profarma.com.br>\r\n";
+        $headers = "From: S.I.C. <noreply@sistema.com.br>\r\n";
         $headers .= "MIME-Version: 1.0\r\n";
         $headers .= "Content-Type: text/html; charset=UTF-8\r\n";
         return @mail($to, $subject, $body, $headers);

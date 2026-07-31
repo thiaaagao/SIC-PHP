@@ -137,7 +137,7 @@ $badgeMap = ['open' => 'danger', 'in_progress' => 'warning text-dark', 'resolved
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Suporte - P.S. Profarma</title>
+    <title>Suporte - S.I.C.</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/theme.css" rel="stylesheet">
     <link href="assets/toast.css" rel="stylesheet">
@@ -145,7 +145,7 @@ $badgeMap = ['open' => 'danger', 'in_progress' => 'warning text-dark', 'resolved
 <body>
     <nav class="navbar navbar-expand <?= Auth::navbarBg() ?> navbar-dark">
         <div class="container">
-            <span class="navbar-brand fw-bold">P.S. Profarma - <?= $isAdmin ? 'Admin' : 'Suporte' ?><?= NavHelper::badge() ?></span>
+            <span class="navbar-brand fw-bold">S.I.C. - <?= $isAdmin ? 'Admin' : 'Suporte' ?><?= NavHelper::badge() ?></span>
             <div class="ms-auto d-flex gap-2 align-items-center">
                 <a href="index.php" class="btn btn-outline-light btn-sm">Dashboard</a>
                 <a href="analytics.php" class="btn btn-outline-light btn-sm">ITIL</a>
