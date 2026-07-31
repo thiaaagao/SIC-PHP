@@ -18,75 +18,134 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $msg = 'Token CSRF invalido.';
         $msgType = 'danger';
     } else {
-    if (isset($_POST['add_user'])) {
-        $username = trim($_POST['username'] ?? '');
-        $password = $_POST['password'] ?? '';
-        $name = trim($_POST['name'] ?? '');
-        $role = $_POST['role'] ?? '';
+        if (isset($_POST['add_user'])) {
+            $username = trim($_POST['username'] ?? '');
+            $password = $_POST['password'] ?? '';
+            $name = trim($_POST['name'] ?? '');
+            $role = $_POST['role'] ?? '';
 
-        if ($username && $password && $name && in_array($role, ['admin', 'suporte_ti', 'encarregado'])) {
-            $hash = password_hash($password, PASSWORD_BCRYPT);
-            $st = $db->prepare("INSERT INTO users (username, password, name, role) VALUES (?, ?, ?, ?)");
-            $st->execute([$username, $hash, $name, $role]);
-            $msg = "Usuario {$username} criado.";
-        } else { $msg = 'Preencha todos os campos.'; $msgType = 'danger'; }
-    }
-
-    if (isset($_POST['edit_user'])) {
-        $id = (int)($_POST['user_id'] ?? 0);
-        $name = trim($_POST['name'] ?? '');
-        $role = $_POST['role'] ?? '';
-        if ($id && $name && in_array($role, ['admin', 'suporte_ti', 'encarregado'])) {
-            $st = $db->prepare("UPDATE users SET name = ?, role = ? WHERE id = ?");
-            $st->execute([$name, $role, $id]);
-            $msg = 'Usuario atualizado.';
+            if ($username && $password && $name && in_array($role, ['admin', 'suporte_ti', 'encarregado'])) {
+                $hash = password_hash($password, PASSWORD_BCRYPT);
+                $st = $db->prepare("INSERT INTO users (username, password, name, role) VALUES (?, ?, ?, ?)");
+                $st->execute([$username, $hash, $name, $role]);
+                AuditLog::log('user_create', 'user', $db->lastInsertId(), "Usuario criado: $username");
+                $msg = "Usuario {$username} criado.";
+            } else { $msg = 'Preencha todos os campos.'; $msgType = 'danger'; }
         }
-    }
 
-    if (isset($_POST['delete_user'])) {
-        $id = (int)($_POST['user_id'] ?? 0);
-        if ($id && $id !== $user['id']) {
-            $st = $db->prepare("SELECT name, role FROM users WHERE id = ?");
-            $st->execute([$id]);
-            $delUser = $st->fetch();
-            if ($delUser) {
-                if ($delUser['role'] === 'admin') {
-                    $adminCount = $db->query("SELECT COUNT(*) FROM users WHERE role = 'admin'")->fetchColumn();
-                    if ($adminCount <= 1) {
-                        $msg = 'Nao e possivel excluir o ultimo administrador.';
-                        $msgType = 'danger';
-                    } else {
-                        $msg = 'Nao e possivel excluir outros administradores.';
-                        $msgType = 'danger';
-                    }
-                } else {
-                    $anonymizedName = 'Ex-Usuario-' . $id;
-                    $db->prepare("UPDATE tickets SET requester_name = ? WHERE requester_name = ?")->execute([$anonymizedName, $delUser['name']]);
-                    $db->prepare("UPDATE comments SET comment = '[REMOVIDO - LGPD]' WHERE user_id = ?")->execute([$id]);
-                    $db->prepare("DELETE FROM ratings WHERE user_id = ?")->execute([$id]);
-                    $db->prepare("DELETE FROM users WHERE id = ?")->execute([$id]);
-                    AuditLog::log('user_delete', 'user', $id, "Usuario {$delUser['name']} anonimizado (LGPD)");
-                    $msg = 'Usuario anonimizado e removido (LGPD).';
+        if (isset($_POST['edit_user'])) {
+            $id = (int)($_POST['user_id'] ?? 0);
+            $name = trim($_POST['name'] ?? '');
+            $role = $_POST['role'] ?? '';
+            if ($id && $name && in_array($role, ['admin', 'suporte_ti', 'encarregado'])) {
+                $st = $db->prepare("UPDATE users SET name = ?, role = ? WHERE id = ?");
+                $st->execute([$name, $role, $id]);
+                AuditLog::log('user_update', 'user', $id, "Usuario atualizado: $name");
+                $msg = 'Usuario atualizado.';
+            }
+        }
+
+        if (isset($_POST['toggle_status'])) {
+            $id = (int)($_POST['user_id'] ?? 0);
+            $newStatus = $_POST['new_status'] ?? '';
+            if ($id && in_array($newStatus, ['active', 'inactive'])) {
+                $st = $db->prepare("SELECT name, status FROM users WHERE id = ?");
+                $st->execute([$id]);
+                $targetUser = $st->fetch();
+                if ($targetUser) {
+                    $db->prepare("UPDATE users SET status = ?, locked_until = NULL, failed_attempts = 0 WHERE id = ?")
+                        ->execute([$newStatus, $id]);
+                    $statusLabel = $newStatus === 'active' ? 'ativado' : 'desativado';
+                    AuditLog::log('user_status', 'user', $id, "Usuario {$targetUser['name']} $statusLabel");
+                    $msg = "Usuario {$targetUser['name']} $statusLabel.";
                 }
             }
-        } else { $msg = 'Nao pode excluir o proprio usuario.'; $msgType = 'danger'; }
-    }
+        }
 
-    if (isset($_POST['reset_password'])) {
-        $id = (int)($_POST['user_id'] ?? 0);
-        $newPass = $_POST['new_password'] ?? '';
-        if ($id && $newPass) {
-            $hash = password_hash($newPass, PASSWORD_BCRYPT);
-            $st = $db->prepare("UPDATE users SET password = ? WHERE id = ?");
-            $st->execute([$hash, $id]);
-            $msg = 'Senha redefinida.';
+        if (isset($_POST['toggle_force_password'])) {
+            $id = (int)($_POST['user_id'] ?? 0);
+            if ($id) {
+                $st = $db->prepare("SELECT name, force_password_change FROM users WHERE id = ?");
+                $st->execute([$id]);
+                $targetUser = $st->fetch();
+                if ($targetUser) {
+                    $newVal = $targetUser['force_password_change'] ? 0 : 1;
+                    $db->prepare("UPDATE users SET force_password_change = ? WHERE id = ?")->execute([$newVal, $id]);
+                    $label = $newVal ? 'ativado' : 'desativado';
+                    AuditLog::log('user_force_password', 'user', $id, "Forcar troca de senha $label para {$targetUser['name']}");
+                    $msg = "Forcar troca de senha $label.";
+                }
+            }
+        }
+
+        if (isset($_POST['unlock_user'])) {
+            $id = (int)($_POST['user_id'] ?? 0);
+            if ($id) {
+                $st = $db->prepare("SELECT name FROM users WHERE id = ?");
+                $st->execute([$id]);
+                $targetUser = $st->fetch();
+                if ($targetUser) {
+                    $db->prepare("UPDATE users SET status = 'active', locked_until = NULL, failed_attempts = 0 WHERE id = ?")
+                        ->execute([$id]);
+                    AuditLog::log('user_unlock', 'user', $id, "Conta desbloqueada: {$targetUser['name']}");
+                    $msg = "Conta de {$targetUser['name']} desbloqueada.";
+                }
+            }
+        }
+
+        if (isset($_POST['delete_user'])) {
+            $id = (int)($_POST['user_id'] ?? 0);
+            if ($id && $id !== $user['id']) {
+                $st = $db->prepare("SELECT name, role FROM users WHERE id = ?");
+                $st->execute([$id]);
+                $delUser = $st->fetch();
+                if ($delUser) {
+                    if ($delUser['role'] === 'admin') {
+                        $adminCount = $db->query("SELECT COUNT(*) FROM users WHERE role = 'admin'")->fetchColumn();
+                        if ($adminCount <= 1) {
+                            $msg = 'Nao e possivel excluir o ultimo administrador.';
+                            $msgType = 'danger';
+                        } else {
+                            $msg = 'Nao e possivel excluir outros administradores.';
+                            $msgType = 'danger';
+                        }
+                    } else {
+                        $anonymizedName = 'Ex-Usuario-' . $id;
+                        $db->prepare("UPDATE tickets SET requester_name = ? WHERE requester_name = ?")->execute([$anonymizedName, $delUser['name']]);
+                        $db->prepare("UPDATE comments SET comment = '[REMOVIDO - LGPD]' WHERE user_id = ?")->execute([$id]);
+                        $db->prepare("DELETE FROM ratings WHERE user_id = ?")->execute([$id]);
+                        $db->prepare("DELETE FROM users WHERE id = ?")->execute([$id]);
+                        AuditLog::log('user_delete', 'user', $id, "Usuario {$delUser['name']} anonimizado (LGPD)");
+                        $msg = 'Usuario anonimizado e removido (LGPD).';
+                    }
+                }
+            } else { $msg = 'Nao pode excluir o proprio usuario.'; $msgType = 'danger'; }
+        }
+
+        if (isset($_POST['reset_password'])) {
+            $id = (int)($_POST['user_id'] ?? 0);
+            $newPass = $_POST['new_password'] ?? '';
+            if ($id && $newPass) {
+                $hash = password_hash($newPass, PASSWORD_BCRYPT);
+                $st = $db->prepare("UPDATE users SET password = ?, force_password_change = 0 WHERE id = ?");
+                $st->execute([$hash, $id]);
+                AuditLog::log('user_password_reset', 'user', $id, "Senha redefinida");
+                $msg = 'Senha redefinida.';
+            }
         }
     }
-    }
+    header('Location: users.php');
+    exit;
 }
 
 $users = $db->query("SELECT * FROM users ORDER BY FIELD(role, 'admin', 'suporte_ti', 'encarregado'), name")->fetchAll();
 $roles = ['admin' => 'Admin (Master)', 'suporte_ti' => 'Suporte TI', 'encarregado' => 'Encarregado'];
+
+$statusMap = [
+    'active' => ['label' => 'Ativo', 'color' => 'success', 'icon' => '&#9679;'],
+    'inactive' => ['label' => 'Inativo', 'color' => 'secondary', 'icon' => '&#9679;'],
+    'locked' => ['label' => 'Bloqueado', 'color' => 'danger', 'icon' => '&#128274;'],
+];
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -96,6 +155,7 @@ $roles = ['admin' => 'Admin (Master)', 'suporte_ti' => 'Suporte TI', 'encarregad
     <title>Admin - Usuarios</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="../assets/theme.css" rel="stylesheet">
+    <link href="../assets/toast.css" rel="stylesheet">
 </head>
 <body>
     <nav class="navbar navbar-expand bg-dark navbar-dark">
@@ -105,7 +165,7 @@ $roles = ['admin' => 'Admin (Master)', 'suporte_ti' => 'Suporte TI', 'encarregad
             <div class="ms-auto d-flex gap-2 align-items-center">
                 <a href="index.php" class="btn btn-outline-light btn-sm">Admin</a>
                 <a href="tickets.php" class="btn btn-outline-light btn-sm">Tickets</a>
-                    <button id="themeToggle" class="btn-theme-toggle" title="Alternar tema"></button>
+                <button id="themeToggle" class="btn-theme-toggle" title="Alternar tema"></button>
             </div>
         </div>
     </nav>
@@ -117,33 +177,124 @@ $roles = ['admin' => 'Admin (Master)', 'suporte_ti' => 'Suporte TI', 'encarregad
             <button type="button" class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#addModal">+ Novo Usuario</button>
         </div>
 
-        <?php if ($msg): ?><div class="alert alert-<?= $msgType ?> py-2"><?= $msg ?></div><?php endif ?>
+        <?php if ($msg): ?>
+            <script>document.addEventListener('DOMContentLoaded', function(){ PS.toast('<?= addslashes(htmlspecialchars($msg)) ?>', '<?= $msgType ?>'); });</script>
+        <?php endif ?>
 
         <div class="card shadow-sm">
             <div class="table-responsive">
                 <table class="table table-hover mb-0">
                     <thead class="table-dark">
-                        <tr><th>ID</th><th>Usuario</th><th>Nome</th><th>Papel</th><th>Criado em</th><th>Acoes</th></tr>
+                        <tr>
+                            <th>ID</th>
+                            <th>Usuario</th>
+                            <th>Nome</th>
+                            <th>Papel</th>
+                            <th>Status</th>
+                            <th>Tentativas</th>
+                            <th>Criado em</th>
+                            <th>Acoes</th>
+                        </tr>
                     </thead>
                     <tbody>
-                        <?php foreach ($users as $u): ?>
-                        <tr>
+                        <?php foreach ($users as $u):
+                            $st = $statusMap[$u['status']] ?? $statusMap['active'];
+                            $isLocked = $u['status'] === 'locked' && $u['locked_until'] && strtotime($u['locked_until']) > time();
+                            $lockedUntil = $isLocked ? date('d/m H:i', strtotime($u['locked_until'])) : null;
+                        ?>
+                        <tr class="<?= $u['status'] === 'inactive' ? 'table-secondary' : ($isLocked ? 'table-danger' : '') ?>">
                             <td><?= $u['id'] ?></td>
-                            <td><?= htmlspecialchars($u['username']) ?></td>
+                            <td>
+                                <?= htmlspecialchars($u['username']) ?>
+                                <?php if ($u['force_password_change']): ?>
+                                    <span class="badge bg-warning text-dark ms-1" title="Forcar troca de senha">&#9888;</span>
+                                <?php endif ?>
+                            </td>
                             <td><?= htmlspecialchars($u['name']) ?></td>
                             <td><span class="badge bg-<?= $u['role'] === 'admin' ? 'dark' : ($u['role'] === 'suporte_ti' ? 'primary' : 'success') ?>"><?= $u['role'] ?></span></td>
+                            <td>
+                                <span class="badge bg-<?= $st['color'] ?>"><?= $st['label'] ?></span>
+                                <?php if ($lockedUntil): ?>
+                                    <small class="text-danger d-block">Ate <?= $lockedUntil ?></small>
+                                <?php endif ?>
+                            </td>
+                            <td class="<?= $u['failed_attempts'] >= 3 ? 'text-danger fw-bold' : '' ?>"><?= $u['failed_attempts'] ?>/5</td>
                             <td><?= date('d/m/Y', strtotime($u['created_at'])) ?></td>
                             <td class="text-nowrap">
-                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal<?= $u['id'] ?>">Editar</button>
-                                <button type="button" class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#resetModal<?= $u['id'] ?>">Senha</button>
-                                <?php if ($u['id'] !== $user['id'] && $u['role'] !== 'admin'): ?>
-                                    <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal<?= $u['id'] ?>">Excluir</button>
-                                <?php endif ?>
+                                <div class="btn-group btn-group-sm">
+                                    <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#editModal<?= $u['id'] ?>" title="Editar">&#9998;</button>
+                                    <button type="button" class="btn btn-outline-warning" data-bs-toggle="modal" data-bs-target="#resetModal<?= $u['id'] ?>" title="Redefinir senha">&#128273;</button>
+
+                                    <?php if ($u['id'] !== $user['id']): ?>
+                                        <?php if ($isLocked): ?>
+                                            <form method="post" class="d-inline">
+                                                <?= Auth::csrfField() ?>
+                                                <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
+                                                <input type="hidden" name="unlock_user" value="1">
+                                                <button type="submit" class="btn btn-outline-success" title="Desbloquear">&#128275;</button>
+                                            </form>
+                                        <?php elseif ($u['status'] === 'active'): ?>
+                                            <form method="post" class="d-inline">
+                                                <?= Auth::csrfField() ?>
+                                                <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
+                                                <input type="hidden" name="new_status" value="inactive">
+                                                <input type="hidden" name="toggle_status" value="1">
+                                                <button type="submit" class="btn btn-outline-secondary" title="Desativar">&#128683;</button>
+                                            </form>
+                                        <?php else: ?>
+                                            <form method="post" class="d-inline">
+                                                <?= Auth::csrfField() ?>
+                                                <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
+                                                <input type="hidden" name="new_status" value="active">
+                                                <input type="hidden" name="toggle_status" value="1">
+                                                <button type="submit" class="btn btn-outline-success" title="Ativar">&#9654;</button>
+                                            </form>
+                                        <?php endif ?>
+
+                                        <form method="post" class="d-inline">
+                                            <?= Auth::csrfField() ?>
+                                            <input type="hidden" name="user_id" value="<?= $u['id'] ?>">
+                                            <input type="hidden" name="toggle_force_password" value="1">
+                                            <button type="submit" class="btn btn-outline-<?= $u['force_password_change'] ? 'warning' : 'info' ?>" title="<?= $u['force_password_change'] ? 'Remover forcar troca' : 'Forcar troca de senha' ?>">&#9888;</button>
+                                        </form>
+
+                                        <?php if ($u['role'] !== 'admin'): ?>
+                                            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal<?= $u['id'] ?>" title="Excluir">&#128465;</button>
+                                        <?php endif ?>
+                                    <?php endif ?>
+                                </div>
                             </td>
                         </tr>
                         <?php endforeach ?>
                     </tbody>
                 </table>
+            </div>
+        </div>
+
+        <div class="row mt-4">
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="fs-3 fw-bold text-success"><?= count(array_filter($users, fn($u) => $u['status'] === 'active')) ?></div>
+                        <div class="small text-muted">Ativos</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="fs-3 fw-bold text-secondary"><?= count(array_filter($users, fn($u) => $u['status'] === 'inactive')) ?></div>
+                        <div class="small text-muted">Inativos</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body text-center">
+                        <div class="fs-3 fw-bold text-danger"><?= count(array_filter($users, fn($u) => $u['status'] === 'locked')) ?></div>
+                        <div class="small text-muted">Bloqueados</div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -208,12 +359,13 @@ $roles = ['admin' => 'Admin (Master)', 'suporte_ti' => 'Suporte TI', 'encarregad
         </form></div>
     </div>
 
-        <div class="modal fade" id="deleteModal<?= $u['id'] ?>" tabindex="-1">
+    <div class="modal fade" id="deleteModal<?= $u['id'] ?>" tabindex="-1">
         <div class="modal-dialog"><form method="post" class="modal-content">
             <?= Auth::csrfField() ?>
             <div class="modal-header"><h6 class="modal-title">Excluir <?= htmlspecialchars($u['username']) ?>?</h6><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
             <div class="modal-body">
                 <p>Tem certeza que deseja excluir <strong><?= htmlspecialchars($u['name']) ?></strong>?</p>
+                <p class="text-danger small">Os dados serao anonimizados conforme LGPD.</p>
             </div>
             <div class="modal-footer">
                 <input type="hidden" name="user_id" value="<?= $u['id'] ?>">

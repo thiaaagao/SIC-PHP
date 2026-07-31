@@ -23,8 +23,13 @@ CREATE TABLE IF NOT EXISTS users (
   username VARCHAR(50) UNIQUE NOT NULL,
   password VARCHAR(255) NOT NULL,
   name VARCHAR(255) NOT NULL,
-  role ENUM('encarregado','solved') NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  role ENUM('admin','suporte_ti','encarregado') NOT NULL,
+  status ENUM('active','inactive','locked') DEFAULT 'active',
+  locked_until TIMESTAMP NULL,
+  failed_attempts INT DEFAULT 0,
+  force_password_change TINYINT DEFAULT 0,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS comments (

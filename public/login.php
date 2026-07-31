@@ -25,16 +25,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $username = $_POST['username'] ?? '';
             $password = $_POST['password'] ?? '';
 
-            if (Auth::login($username, $password)) {
-                RateLimit::clear($clientIp);
-                AuditLog::log('login', 'user', $_SESSION['user_id'] ?? null, "Login bem-sucedido: $username");
-                $role = Auth::getRole();
-                header('Location: ' . ($role === 'encarregado' ? 'index.php' : 'support.php'));
-                exit;
+            // Verificar status antes de tentar login
+            $db = Database::getInstance();
+            $checkStmt = $db->prepare("SELECT status, locked_until FROM users WHERE username = ?");
+            $checkStmt->execute([$username]);
+            $checkUser = $checkStmt->fetch();
+
+            if ($checkUser) {
+                if ($checkUser['status'] === 'inactive') {
+                    $error = 'Conta desativada. Contate o administrador.';
+                } elseif ($checkUser['status'] === 'locked') {
+                    if ($checkUser['locked_until'] && strtotime($checkUser['locked_until']) > time()) {
+                        $until = date('H:i', strtotime($checkUser['locked_until']));
+                        $error = "Conta bloqueada ate $until. Aguarde ou contate o administrador.";
+                    }
+                }
             }
-            RateLimit::record($clientIp);
-            AuditLog::log('login_failed', 'user', null, "Tentativa de login: $username");
-            $error = 'Usuario ou senha invalidos.';
+
+            if (!$error) {
+                if (Auth::login($username, $password)) {
+                    RateLimit::clear($clientIp);
+                    AuditLog::log('login', 'user', $_SESSION['user_id'] ?? null, "Login bem-sucedido: $username");
+                    $role = Auth::getRole();
+                    header('Location: ' . ($role === 'encarregado' ? 'index.php' : 'support.php'));
+                    exit;
+                }
+                RateLimit::record($clientIp);
+                AuditLog::log('login_failed', 'user', null, "Tentativa de login: $username");
+                $error = 'Usuario ou senha invalidos.';
+            }
         }
     }
 }

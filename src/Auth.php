@@ -39,16 +39,53 @@ class Auth
         $stmt->execute([$username]);
         $user = $stmt->fetch();
 
-        if ($user && password_verify($password, $user['password'])) {
-            $_SESSION['user'] = [
-                'id' => $user['id'],
-                'username' => $user['username'],
-                'name' => $user['name'],
-                'role' => $user['role'],
-            ];
-            return true;
+        if (!$user) {
+            return false;
         }
-        return false;
+
+        // Verificar se conta esta bloqueada
+        if ($user['status'] === 'locked') {
+            if ($user['locked_until'] && strtotime($user['locked_until']) > time()) {
+                return false; // Ainda bloqueada
+            }
+            // Desbloquear automaticamente apos o tempo
+            $db->prepare("UPDATE users SET status = 'active', locked_until = NULL, failed_attempts = 0 WHERE id = ?")->execute([$user['id']]);
+            $user['status'] = 'active';
+        }
+
+        // Verificar se conta esta inativa
+        if ($user['status'] === 'inactive') {
+            return false;
+        }
+
+        // Verificar senha
+        if (!password_verify($password, $user['password'])) {
+            // Incrementar tentativas falhas
+            $attempts = $user['failed_attempts'] + 1;
+            if ($attempts >= 5) {
+                // Bloquear por 30 minutos
+                $lockedUntil = date('Y-m-d H:i:s', time() + 1800);
+                $db->prepare("UPDATE users SET failed_attempts = ?, status = 'locked', locked_until = ? WHERE id = ?")
+                    ->execute([$attempts, $lockedUntil, $user['id']]);
+            } else {
+                $db->prepare("UPDATE users SET failed_attempts = ? WHERE id = ?")
+                    ->execute([$attempts, $user['id']]);
+            }
+            return false;
+        }
+
+        // Login bem-sucedido - resetar tentativas
+        $db->prepare("UPDATE users SET failed_attempts = 0, locked_until = NULL WHERE id = ?")
+            ->execute([$user['id']]);
+
+        $_SESSION['user'] = [
+            'id' => $user['id'],
+            'username' => $user['username'],
+            'name' => $user['name'],
+            'role' => $user['role'],
+            'force_password_change' => $user['force_password_change'],
+        ];
+        return true;
     }
 
     public static function isLoggedIn(): bool
@@ -117,6 +154,20 @@ class Auth
     public static function canViewAnalytics(): bool
     {
         return self::hasMinLevel('suporte_ti');
+    }
+
+    public static function mustChangePassword(): bool
+    {
+        return ($_SESSION['user']['force_password_change'] ?? 0) == 1;
+    }
+
+    public static function changePassword(int $userId, string $newPassword): void
+    {
+        $db = Database::getInstance();
+        $hash = password_hash($newPassword, PASSWORD_BCRYPT);
+        $db->prepare("UPDATE users SET password = ?, force_password_change = 0 WHERE id = ?")
+            ->execute([$hash, $userId]);
+        $_SESSION['user']['force_password_change'] = 0;
     }
 
     public static function logout(): void

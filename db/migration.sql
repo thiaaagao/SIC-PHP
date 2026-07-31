@@ -1,34 +1,11 @@
 USE ps_system;
 
-CREATE TABLE IF NOT EXISTS users (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  username VARCHAR(50) UNIQUE NOT NULL,
-  password VARCHAR(255) NOT NULL,
-  name VARCHAR(255) NOT NULL,
-  role ENUM('encarregado','solved') NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB;
+-- Migracao: Adicionar campos de status aos usuarios
+-- Execute este arquivo se o banco ja existe sem os campos de status
 
-CREATE TABLE IF NOT EXISTS comments (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  ticket_id INT NOT NULL,
-  user_id INT NOT NULL,
-  comment TEXT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE,
-  FOREIGN KEY (user_id) REFERENCES users(id)
-) ENGINE=InnoDB;
-
-CREATE TABLE IF NOT EXISTS ratings (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  ticket_id INT NOT NULL,
-  user_id INT NOT NULL,
-  rating TINYINT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  FOREIGN KEY (ticket_id) REFERENCES tickets(id) ON DELETE CASCADE,
-  FOREIGN KEY (user_id) REFERENCES users(id)
-) ENGINE=InnoDB;
-
-INSERT IGNORE INTO users (username, password, name, role) VALUES
-('encarregado', '$2y$10$mqHAYmci/2ABjIid1JpGZOO1sEMDze3TeURDKOwfHdAe7tznxMpRe', 'Encarregado Geral', 'encarregado'),
-('suporte', '$2y$10$H1Vx6D2NiHPhGnEXr59W6uavbdL6Gq/HMj1vtHNalouGpBBdKAUPu', 'Suporte TI', 'suporte_ti');
+ALTER TABLE users
+    ADD COLUMN IF NOT EXISTS status ENUM('active','inactive','locked') DEFAULT 'active' AFTER role,
+    ADD COLUMN IF NOT EXISTS locked_until TIMESTAMP NULL AFTER status,
+    ADD COLUMN IF NOT EXISTS failed_attempts INT DEFAULT 0 AFTER locked_until,
+    ADD COLUMN IF NOT EXISTS force_password_change TINYINT DEFAULT 0 AFTER failed_attempts,
+    ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP AFTER created_at;
