@@ -2,8 +2,7 @@
 
 Sistema web para abertura, acompanhamento e resolucao de chamados de TI, seguindo boas praticas ITIL.
 
-**Stack:** PHP 8.2 + MariaDB/MySQL + Bootstrap 5 + Chart.js  
-**Servidor:** Apache (XAMPP, porta 8080)
+**Stack:** PHP 8.2 + MariaDB/MySQL + Bootstrap 5 + Chart.js
 
 ---
 
@@ -27,76 +26,231 @@ Sistema web para abertura, acompanhamento e resolucao de chamados de TI, seguind
 
 ---
 
-## Requisitos
+## Opcoes de Deploy
 
-- PHP 8.2+
-- MariaDB ou MySQL
-- Apache (XAMPP recomendado)
-- XAMPP na porta 8080
+### 1. Docker (Recomendado)
+
+O mais rapido e portavel. Funciona em qualquer SO com Docker instalado.
+
+#### Pre-requisitos
+- Docker + Docker Compose
+
+#### Instalacao
+
+```bash
+# Clonar
+git clone https://github.com/thiaaagao/SIC-PHP.git
+cd SIC-PHP
+
+# Subir containers
+docker-compose up -d
+
+# Acessar
+http://localhost:8080
+```
+
+O Docker cria automaticamente:
+- Container MariaDB 11 com o banco `ps_system`
+- Container PHP 8.2 + Apache
+- Schema importado na primeira execucao
+
+#### Comandos uteis
+
+```bash
+# Ver logs
+docker-compose logs -f web
+
+# Parar containers
+docker-compose down
+
+# Parar e apagar dados
+docker-compose down -v
+
+# Rebuild apos alteracoes
+docker-compose up -d --build
+
+# Acessar banco
+docker exec -it sic-db mariadb -u root -proot ps_system
+```
 
 ---
 
-## Instalacao
+### 2. XAMPP (Windows)
 
-### 1. Clonar o repositorio
+Ideal para desenvolvimento local no Windows.
 
-```bash
-git clone https://github.com/thiaaagao/SIC-PHP.git
-```
+#### Pre-requisitos
+- XAMPP com PHP 8.2+ e MariaDB/MySQL
 
-### 2. Configurar o XAMPP
-
-O XAMPP deve rodar na **porta 8080**. Edite `C:\xampp\apache\conf\httpd.conf`:
-
-```apache
-Listen 8080
-ServerName localhost:8080
-```
-
-### 3. Criar o junction (atalho)
+#### Instalacao
 
 ```powershell
-# No PowerShell como Administrador
-New-Item -ItemType Junction -Path "C:\xampp\htdocs\ps-system" -Target "C:\caminho\para\SIC-PHP"
+# 1. Configurar XAMPP na porta 8080
+#    Editar C:\xampp\apache\conf\httpd.conf:
+#    Listen 8080
+#    ServerName localhost:8080
+
+# 2. Criar junction
+New-Item -ItemType Junction -Path "C:\xampp\htdocs\sic" -Target "C:\caminho\para\SIC-PHP"
+
+# 3. Criar banco via phpMyAdmin
+#    Acessar http://localhost:8080/phpmyadmin
+#    Criar banco "ps_system"
+#    Importar db/schema.sql
 ```
 
-### 4. Criar o banco de dados
+#### Acessar
 
-Acesse o phpMyAdmin (`http://localhost:8080/phpmyadmin`) e execute:
-
-```sql
-SOURCE db/schema.sql;
+```
+http://localhost:8080/sic/
 ```
 
-Ou crie manualmente o banco `ps_system` e importe o arquivo `db/schema.sql`.
+---
 
-### 5. Configurar o webhook do Teams (opcional)
+### 3. VPS / Servidor Linux (Producao)
 
-Edite `config.php` e substitua:
+Para ambientes de producao com Ubuntu/Debian.
+
+#### Pre-requisitos
+- Ubuntu 22.04+ ou Debian 12+
+- Acesso SSH root ou sudo
+
+#### Script de instalacao
+
+```bash
+#!/bin/bash
+# setup-sic.sh - Instalar S.I.C. em VPS
+
+set -e
+
+echo "=== Atualizando sistema ==="
+apt update && apt upgrade -y
+
+echo "=== Instalando Apache + PHP + MariaDB ==="
+apt install -y apache2 php8.2 libapache2-mod-php8.2 php8.2-mysql \
+    php8.2-mbstring php8.2-xml php8.2-curl php8.2-gd mariadb-server
+
+echo "=== Habilitando mod_rewrite ==="
+a2enmod rewrite
+
+echo "=== Configurando Apache ==="
+cat > /etc/apache2/sites-available/sic.conf << 'EOF'
+<VirtualHost *:80>
+    ServerName sic.local
+    DocumentRoot /var/www/sic/public
+    
+    <Directory /var/www/sic/public>
+        AllowOverride All
+        Require all granted
+    </Directory>
+    
+    ErrorLog ${APACHE_LOG_DIR}/sic_error.log
+    CustomLog ${APACHE_LOG_DIR}/sic_access.log combined
+</VirtualHost>
+EOF
+
+a2ensite sic.conf
+systemctl reload apache2
+
+echo "=== Configurando banco ==="
+mysql -e "CREATE DATABASE IF NOT EXISTS ps_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -e "CREATE USER IF NOT EXISTS 'sic'@'localhost' IDENTIFIED BY 'SUA_SENHA_AQUI';"
+mysql -e "GRANT ALL ON ps_system.* TO 'sic'@'localhost';"
+mysql ps_system < /var/www/sic/db/schema.sql
+
+echo "=== Configurando permissoes ==="
+chown -R www-data:www-data /var/www/sic
+chmod -R 755 /var/www/sic/storage
+
+echo "=== S.I.C. instalado com sucesso! ==="
+echo "Acesse: http://sic.local"
+echo "Ou configure um dominio no DNS"
+```
+
+#### Configurar banco
+
+Edite `config.php`:
 
 ```php
-define('TEAMS_WEBHOOK_URL', 'https://seu-webhook-power-automate.aqui');
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'ps_system');
+define('DB_USER', 'sic');
+define('DB_PASS', 'SUA_SENHA_AQUI');
 ```
 
-Para criar o webhook:
-1. Abra o Microsoft Teams
-2. Crie um Fluxo no Power Automate
-3. Use o trigger "Manually flow a flow"
-4. Copie a URL de webhook gerada
+#### HTTPS (Let's Encrypt)
 
-### 6. Acessar o sistema
-
-```
-http://localhost:8080/ps-system/
+```bash
+apt install -y certbot python3-certbot-apache
+certbot --apache -d sic.suadominio.com
 ```
 
-O `index.php` redireciona automaticamente para o login.
+---
+
+### 4. PHP Built-in Server (Desenvolvimento)
+
+Para testes rapidos sem Apache/Nginx.
+
+```bash
+# Navegar ate a pasta public
+cd SIC-PHP/public
+
+# Iniciar servidor na porta 8080
+php -S localhost:8080
+
+# Acessar
+http://localhost:8080
+```
+
+> **Nota:** O PHP built-in server nao processa `.htaccess`. Para producao, use Apache ou Nginx.
+
+---
+
+### 5. Nginx + PHP-FPM (Producao)
+
+Alternativa leve ao Apache.
+
+#### Instalacao
+
+```bash
+apt install -y nginx php8.2-fpm php8.2-mysql
+```
+
+#### Configuracao Nginx
+
+```nginx
+# /etc/nginx/sites-available/sic
+server {
+    listen 80;
+    server_name sic.local;
+    root /var/www/sic/public;
+    index index.php;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php8.2-fpm.sock;
+    }
+
+    location ~ /\.ht {
+        deny all;
+    }
+}
+```
+
+```bash
+ln -s /etc/nginx/sites-available/sic /etc/nginx/sites-enabled/
+nginx -t && systemctl reload nginx
+```
 
 ---
 
 ## Credenciais
 
-Os usuarios sao criados pelo `db/schema.sql`. Para criar novos usuarios, acesse o painel admin.
+Os usuarios sao criados pelo `db/schema.sql`.
 
 | Papel | Nivel | Descricao |
 |-------|-------|-----------|
@@ -111,37 +265,35 @@ Os usuarios sao criados pelo `db/schema.sql`. Para criar novos usuarios, acesse 
 
 ## Zerar o Banco de Dados
 
-### Opcao 1: Recriar do zero
+### Docker
+
+```bash
+docker-compose down -v
+docker-compose up -d
+```
+
+### XAMPP / VPS
 
 ```sql
 DROP DATABASE IF EXISTS ps_system;
+CREATE DATABASE ps_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE ps_system;
 SOURCE db/schema.sql;
 ```
 
-### Opcao 2: Manter estrutura, limpar dados
+### Limpar dados (manter estrutura)
 
 ```sql
 USE ps_system;
-
--- Limpar todos os dados (cuidado!)
 TRUNCATE TABLE ticket_attachments;
 TRUNCATE TABLE audit_logs;
 TRUNCATE TABLE access_logs;
 TRUNCATE TABLE comments;
 TRUNCATE TABLE ratings;
 TRUNCATE TABLE tickets;
-
--- Recriar usuarios padrao
 DELETE FROM users;
-SOURCE db/schema.sql;  -- So os INSERTs de usuarios
+SOURCE db/schema.sql;
 ```
-
-### Opcao 3: Via phpMyAdmin
-
-1. Acesse `http://localhost:8080/phpmyadmin`
-2. Selecione o banco `ps_system`
-3. Aba "Operacoes" > "Remover tabela" (para cada tabela)
-4. Importe `db/schema.sql`
 
 ---
 
@@ -149,7 +301,10 @@ SOURCE db/schema.sql;  -- So os INSERTs de usuarios
 
 ```
 SIC-PHP/
-├── config.php              # Configuracoes gerais, funcoes SLA, logAccess()
+├── Dockerfile              # Imagem Docker PHP+Apache
+├── docker-compose.yml      # Stack completa (PHP+MariaDB)
+├── .dockerignore           # Arquivos excluidos do Docker
+├── config.php              # Configuracoes gerais, funcoes SLA
 ├── db/
 │   ├── schema.sql          # Schema completo do banco
 │   └── migration.sql       # Migracoes
@@ -244,7 +399,7 @@ Content-Type: application/json
   "ok": true,
   "id": 1,
   "code": "PS-0001",
-  "url": "http://localhost:8080/ps-system/ticket.php?id=1"
+  "url": "http://localhost:8080/ticket.php?id=1"
 }
 ```
 
@@ -267,14 +422,18 @@ Content-Type: application/json
 
 ## Comandos Uteis
 
-```powershell
+```bash
 # Verificar sintaxe PHP
-& "C:\xampp\php\php.exe" -n -l arquivo.php
+php -l arquivo.php
 
 # Testar login via curl
-$html = curl.exe -s -c cookies.txt "http://localhost:8080/ps-system/login.php?role=admin"
-$token = [regex]::Match($html, 'name="csrf_token" value="([^"]+)"').Groups[1].Value
-curl.exe -s -c cookies.txt -b cookies.txt -d "username=admin&password=SENHA&csrf_token=$token" -X POST -L "http://localhost:8080/ps-system/login.php?role=admin"
+curl -c cookies.txt "http://localhost:8080/login.php?role=admin"
+# Extrair token e fazer login
+curl -b cookies.txt -d "username=admin&password=SENHA&csrf_token=TOKEN" \
+    -X POST "http://localhost:8080/login.php?role=admin"
+
+# Verificar banco (Docker)
+docker exec -it sic-db mariadb -u root -proot ps_system -e "SELECT COUNT(*) FROM tickets;"
 ```
 
 ---

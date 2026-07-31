@@ -18,10 +18,10 @@ function sendSecurityHeaders(): void
     header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; img-src 'self' data:; font-src 'self' https://cdn.jsdelivr.net;");
 }
 
-define('DB_HOST', '127.0.0.1');
-define('DB_NAME', 'ps_system');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+define('DB_HOST', $_ENV['DB_HOST'] ?? '127.0.0.1');
+define('DB_NAME', $_ENV['DB_NAME'] ?? 'ps_system');
+define('DB_USER', $_ENV['DB_USER'] ?? 'root');
+define('DB_PASS', $_ENV['DB_PASS'] ?? '');
 
 define('TEAMS_WEBHOOK_URL', 'YOUR_POWER_AUTOMATE_WEBHOOK_URL_HERE');
 

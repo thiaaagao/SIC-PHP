@@ -1,0 +1,10 @@
+.git
+.gitignore
+.vscode
+.idea
+*.md
+cookies_*.txt
+storage/ratelimit/*
+storage/uploads/*
+!storage/uploads/.gitkeep
+!storage/ratelimit/.gitkeep
