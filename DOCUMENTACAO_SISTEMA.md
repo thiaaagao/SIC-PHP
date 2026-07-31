@@ -367,13 +367,14 @@ BASE_URL  = 'http://localhost:8080/ps-system'
 | Coletor | Leitor, Bateria, Configuracao, Outros |
 | Outros | Solicitacao, D duvida, Manutencao, Outros |
 
-**Usuarios iniciais:**
-| Usuario | Senha | Papel |
-|---------|-------|-------|
-| `admin` | `master@2026` | Admin (Master) |
-| `suporte` | `sup@2026` | Suporte TI |
-| `encarregado` | `encarregado@2026` | Encarregado |
-| `yago.silva` | `yago123` | Encarregado |
+**Usuarios iniciais (criados pelo schema.sql):**
+| Usuario | Papel |
+|---------|-------|
+| `admin` | Admin (Master) |
+| `suporte` | Suporte TI |
+| `encarregado` | Encarregado |
+
+> Senhas sao geradas com `password_hash()` no schema. Crie os usuarios via painel admin ou execute o schema.sql.
 
 ---
 
@@ -1025,20 +1026,21 @@ curl -X POST http://localhost:8080/ps-system/api/abrir_chamado.php `
 
 ### Usuarios do Sistema
 
-| Usuario | Senha | Nome | Papel |
-|---------|-------|------|-------|
-| `admin` | `master@2026` | Admin Master | admin |
-| `suporte` | `sup@2026` | Suporte TI | suporte_ti |
-| `encarregado` | `encarregado@2026` | Encarregado Geral | encarregado |
-| `yago.silva` | `yago123` | Yago Silva | encarregado |
+| Usuario | Nome | Papel |
+|---------|------|-------|
+| `admin` | Admin Master | admin |
+| `suporte` | Suporte TI | suporte_ti |
+| `encarregado` | Encarregado Geral | encarregado |
+
+> Crie os usuarios via painel admin (`admin/users.php`) ou execute `db/schema.sql`.
 
 ### Webhook Teams
 
 ```
-TEAMS_WEBHOOK_URL = https://default25b01dedbdbe483f9f133a33e59dc1.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/8084f07f493d466fa50785d22e4a6ce3/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=HXAHnMBjUSkCZ1F-x9N_rAlphgG-FEUuUngDtGrk3i4
+TEAMS_WEBHOOK_URL = YOUR_POWER_AUTOMATE_WEBHOOK_URL_HERE
 ```
 
-> **Atencao:** Esta URL contem token de autenticacao. Nao compartilhar publicamente.
+> Configure sua URL de webhook do Power Automate em `config.php`.
 
 ### Maapeamento GLPI (IPs Fixos)
 
@@ -1141,10 +1143,10 @@ $user = Auth::getUser();
 # Verificar sintaxe PHP
 & "C:\xampp\php\php.exe" -n -l arquivo.php
 
-# Testar endpoint via curl
+# Testar endpoint via curl (substitua SENHA pela senha do usuario)
 $html = curl.exe -s -c cookies.txt "http://localhost:8080/ps-system/login.php?role=admin"
 $token = [regex]::Match($html, 'name="csrf_token" value="([^"]+)"').Groups[1].Value
-curl.exe -s -c cookies.txt -b cookies.txt -d "username=admin&password=master@2026&csrf_token=$token" -X POST -L -o NUL "http://localhost:8080/ps-system/login.php?role=admin"
+curl.exe -s -c cookies.txt -b cookies.txt -d "username=admin&password=SENHA&csrf_token=$token" -X POST -L -o NUL "http://localhost:8080/ps-system/login.php?role=admin"
 
 # Testar pagina autenticada
 curl.exe -s -b cookies.txt -o NUL -w "%{http_code}" "http://localhost:8080/ps-system/pagina.php"

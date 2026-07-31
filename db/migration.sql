@@ -30,5 +30,5 @@ CREATE TABLE IF NOT EXISTS ratings (
 ) ENGINE=InnoDB;
 
 INSERT IGNORE INTO users (username, password, name, role) VALUES
-('encarregado', 'encarregado@2026', 'Encarregado Geral', 'encarregado'),
-('suporte', 'suporte@2026', 'Suporte TI', 'solved');
+('encarregado', '$2y$10$mqHAYmci/2ABjIid1JpGZOO1sEMDze3TeURDKOwfHdAe7tznxMpRe', 'Encarregado Geral', 'encarregado'),
+('suporte', '$2y$10$H1Vx6D2NiHPhGnEXr59W6uavbdL6Gq/HMj1vtHNalouGpBBdKAUPu', 'Suporte TI', 'suporte_ti');

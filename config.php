@@ -23,7 +23,7 @@ define('DB_NAME', 'ps_system');
 define('DB_USER', 'root');
 define('DB_PASS', '');
 
-define('TEAMS_WEBHOOK_URL', 'https://default25b01dedbdbe483f9f133a33e59dc1.2c.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/8084f07f493d466fa50785d22e4a6ce3/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=HXAHnMBjUSkCZ1F-x9N_rAlphgG-FEUuUngDtGrk3i4');
+define('TEAMS_WEBHOOK_URL', 'YOUR_POWER_AUTOMATE_WEBHOOK_URL_HERE');
 
 define('ALLOWED_IPS', [
     '127.0.0.1',

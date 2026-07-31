@@ -61,12 +61,13 @@ $checks['apache'] = ['status' => 'ok', 'msg' => 'Apache rodando na porta 8080'];
             <div class="card-header"><strong>Hierarquia de Acesso</strong></div>
             <div class="card-body">
                 <table class="table table-sm mb-0">
-                    <tr><th>Nivel</th><th>Papel</th><th>Usuario</th><th>Senha</th><th>Navbar</th></tr>
-                    <tr><td>3</td><td>Admin (Master)</td><td><code>admin</code></td><td><code>master@2026</code></td><td><span class="badge bg-dark">escuro</span></td></tr>
-                    <tr><td>2</td><td>Suporte TI</td><td><code>suporte</code></td><td><code>suporte@2026</code></td><td><span class="badge bg-primary">azul</span></td></tr>
-                    <tr><td>1</td><td>Encarregado</td><td><code>encarregado</code></td><td><code>encarregado@2026</code></td><td><span class="badge bg-success">verde</span></td></tr>
-                    <tr><td>0</td><td>Visitante</td><td>sem login</td><td>-</td><td><span class="badge bg-secondary">cinza</span></td></tr>
+                    <tr><th>Nivel</th><th>Papel</th><th>Usuario</th><th>Navbar</th></tr>
+                    <tr><td>3</td><td>Admin (Master)</td><td><code>admin</code></td><td><span class="badge bg-dark">escuro</span></td></tr>
+                    <tr><td>2</td><td>Suporte TI</td><td><code>suporte</code></td><td><span class="badge bg-primary">azul</span></td></tr>
+                    <tr><td>1</td><td>Encarregado</td><td><code>encarregado</code></td><td><span class="badge bg-success">verde</span></td></tr>
+                    <tr><td>0</td><td>Visitante</td><td>sem login</td><td><span class="badge bg-secondary">cinza</span></td></tr>
                 </table>
+                <small class="text-muted mt-2 d-block">Crie usuarios e gerencie senhas em <a href="admin/users.php">Admin > Usuarios</a></small>
             </div>
         </div>
 

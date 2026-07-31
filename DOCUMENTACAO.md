@@ -76,10 +76,7 @@ Sistema interno para abertura, acompanhamento e resolução de chamados técnico
 
 ### Credenciais Padrão
 
-| Papel | Usuário | Senha |
-|-------|---------|-------|
-| Encarregado | `encarregado` | `encarregado@2026` |
-| Suporte Técnico | `suporte` | `suporte@2026` |
+> Crie os usuarios via painel admin ou execute `db/schema.sql`. As senhas sao geradas com `password_hash()`.
 
 ---
 
