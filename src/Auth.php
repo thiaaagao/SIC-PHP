@@ -17,6 +17,10 @@ class Auth
             http_response_code(403);
             die('Acesso negado: IP nao autorizado.');
         }
+        if (self::isLoggedIn() && self::mustChangePassword() && basename($_SERVER['SCRIPT_FILENAME'] ?? '') !== 'change_password.php') {
+            header('Location: change_password.php');
+            exit;
+        }
     }
 
     public static function isIpAllowed(): bool
@@ -182,7 +186,16 @@ class Auth
 
     public static function mustChangePassword(): bool
     {
-        return ($_SESSION['user']['force_password_change'] ?? 0) == 1;
+        if (!self::isLoggedIn()) return false;
+        $db = Database::getInstance();
+        $stmt = $db->prepare("SELECT force_password_change FROM users WHERE id = ?");
+        $stmt->execute([$_SESSION['user']['id']]);
+        $row = $stmt->fetch();
+        $current = (int) ($row['force_password_change'] ?? 0);
+        if ($current != ($_SESSION['user']['force_password_change'] ?? 0)) {
+            $_SESSION['user']['force_password_change'] = $current;
+        }
+        return $current == 1;
     }
 
     public static function changePassword(int $userId, string $newPassword): void

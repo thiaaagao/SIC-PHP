@@ -47,6 +47,7 @@ $checks['apache'] = ['status' => 'ok', 'msg' => 'Apache rodando na porta 8080'];
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Setup - S.I.C.</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="assets/theme.css" rel="stylesheet">
 </head>
 <body>
     <div class="container py-5">
@@ -87,5 +88,6 @@ $checks['apache'] = ['status' => 'ok', 'msg' => 'Apache rodando na porta 8080'];
             <a href="open_ticket.php" class="btn btn-outline-primary">Abrir P.S.</a>
         </div>
     </div>
+    <script src="assets/theme.js"></script>
 </body>
 </html>

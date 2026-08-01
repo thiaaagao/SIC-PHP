@@ -134,6 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= $isVisitor ? 'Alerta Rapido' : 'Abrir P.S.' ?> - S.I.C.</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/theme.css" rel="stylesheet">
     <link href="assets/toast.css" rel="stylesheet">
 </head>
 <body>
@@ -151,6 +152,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php if ($user): ?>
                     <a href="logout.php" class="btn btn-outline-light btn-sm">Sair</a>
                 <?php endif ?>
+                <button id="themeToggle" class="btn-theme-toggle" title="Alternar tema"></button>
             </div>
         </div>
     </nav>
@@ -319,6 +321,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="text-center mt-4 mb-3">
         <a href="privacy.php" class="text-muted small">Politica de Privacidade</a>
     </div>
+    <script src="assets/theme.js"></script>
     <script src="assets/toast.js"></script>
     <script src="assets/app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

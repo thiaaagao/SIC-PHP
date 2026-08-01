@@ -53,6 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alterar Senha - S.I.C.</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/theme.css" rel="stylesheet">
     <link href="assets/toast.css" rel="stylesheet">
 </head>
 <body class="d-flex align-items-center" style="min-height:100vh">
@@ -90,6 +91,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     </div>
+    <script src="assets/theme.js"></script>
     <script src="assets/toast.js"></script>
 </body>
 </html>
