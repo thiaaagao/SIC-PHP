@@ -52,15 +52,16 @@ $trendResolved = array_map(fn($m) => (int)$m['resolved'], $monthlyTrend);
     <link href="assets/theme.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <style>
-        .chart-container { position: relative; height: 250px; }
-        .metric-value { font-size: 2rem; font-weight: 700; line-height: 1.2; color: var(--text-main); }
-        .metric-label { font-size: .8rem; text-transform: uppercase; letter-spacing: .5px; color: var(--text-secondary); }
-        .itil-section { border-left: 4px solid #0d6efd; padding-left: 1rem; margin-bottom: 1.5rem; }
+        .chart-container { position: relative; height: 280px; }
+        .metric-value { font-size: 2.2rem; font-weight: 700; line-height: 1.2; color: var(--text-main); }
+        .metric-label { font-size: .75rem; text-transform: uppercase; letter-spacing: .8px; color: var(--text-secondary); font-weight: 500; }
+        .metric-sub { font-size: .78rem; color: var(--text-muted); }
+        .itil-section { border-left: 4px solid #0d6efd; padding-left: 1rem; margin-bottom: 0.75rem; }
         .itil-section.csi { border-left-color: #198754; }
         .itil-section.incident { border-left-color: #dc3545; }
         .itil-section.service { border-left-color: #6f42c1; }
         .itil-section.problem { border-left-color: #fd7e14; }
-        .itil-section h6 { color: var(--text-main); }
+        .itil-section h6 { color: var(--text-main); font-weight: 600; letter-spacing: 0.2px; }
     </style>
 </head>
 <body>
@@ -91,38 +92,38 @@ $trendResolved = array_map(fn($m) => (int)$m['resolved'], $monthlyTrend);
 
         <div class="row g-3 mb-4">
             <div class="col-6 col-md-3">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body text-center">
+                <div class="card border-0 shadow-sm h-100 metric-card accent-primary">
+                    <div class="card-body text-center py-4">
                         <div class="metric-value text-primary"><?= $totalTickets ?></div>
                         <div class="metric-label">Total de Incidentes</div>
-                        <small class="text-muted">ITIL: Gerenciamento de Incidente</small>
+                        <small class="metric-sub">ITIL: Gerenciamento de Incidente</small>
                     </div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body text-center">
+                <div class="card border-0 shadow-sm h-100 metric-card accent-success">
+                    <div class="card-body text-center py-4">
                         <div class="metric-value text-success"><?= $resolvedTickets ?></div>
                         <div class="metric-label">Resolvidos</div>
-                        <small class="text-muted"><?= $totalTickets > 0 ? round($resolvedTickets / $totalTickets * 100) : 0 ?>% Taxa de Resolucao</small>
+                        <small class="metric-sub"><?= $totalTickets > 0 ? round($resolvedTickets / $totalTickets * 100) : 0 ?>% Taxa de Resolucao</small>
                     </div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body text-center">
+                <div class="card border-0 shadow-sm h-100 metric-card accent-warning">
+                    <div class="card-body text-center py-4">
                         <div class="metric-value text-warning"><?= number_format($avgResolveHours, 1) ?>h</div>
                         <div class="metric-label">Tempo Medio Resolucao</div>
-                        <small class="text-muted">ITIL: SLA / Nivel de Servico</small>
+                        <small class="metric-sub">ITIL: SLA / Nivel de Servico</small>
                     </div>
                 </div>
             </div>
             <div class="col-6 col-md-3">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body text-center">
+                <div class="card border-0 shadow-sm h-100 metric-card accent-cyan">
+                    <div class="card-body text-center py-4">
                         <div class="metric-value text-info"><?= number_format($avgRating, 1) ?> *</div>
                         <div class="metric-label">Satisfacao Media</div>
-                        <small class="text-muted">ITIL: CSI / Melhoria Continua</small>
+                        <small class="metric-sub">ITIL: CSI / Melhoria Continua</small>
                     </div>
                 </div>
             </div>
@@ -133,7 +134,7 @@ $trendResolved = array_map(fn($m) => (int)$m['resolved'], $monthlyTrend);
                 <div class="itil-section incident">
                     <h6 class="fw-bold">Gerenciamento de Incidentes - Tendencia Mensal</h6>
                 </div>
-                <div class="card shadow-sm">
+                <div class="card shadow-sm chart-card">
                     <div class="card-body">
                         <div class="chart-container"><canvas id="trendChart"></canvas></div>
                     </div>
@@ -143,7 +144,7 @@ $trendResolved = array_map(fn($m) => (int)$m['resolved'], $monthlyTrend);
                 <div class="itil-section incident">
                     <h6 class="fw-bold">Status dos Incidentes</h6>
                 </div>
-                <div class="card shadow-sm">
+                <div class="card shadow-sm chart-card">
                     <div class="card-body">
                         <div class="chart-container"><canvas id="statusChart"></canvas></div>
                     </div>
@@ -156,7 +157,7 @@ $trendResolved = array_map(fn($m) => (int)$m['resolved'], $monthlyTrend);
                 <div class="itil-section problem">
                     <h6 class="fw-bold">Gerenciamento de Problemas - Categorias</h6>
                 </div>
-                <div class="card shadow-sm">
+                <div class="card shadow-sm chart-card">
                     <div class="card-body">
                         <div class="chart-container"><canvas id="categoryChart"></canvas></div>
                     </div>
@@ -166,7 +167,7 @@ $trendResolved = array_map(fn($m) => (int)$m['resolved'], $monthlyTrend);
                 <div class="itil-section problem">
                     <h6 class="fw-bold">Top Problemas Recorrentes</h6>
                 </div>
-                <div class="card shadow-sm">
+                <div class="card shadow-sm chart-card">
                     <div class="card-body">
                         <div class="chart-container"><canvas id="problemChart"></canvas></div>
                     </div>
@@ -179,7 +180,7 @@ $trendResolved = array_map(fn($m) => (int)$m['resolved'], $monthlyTrend);
                 <div class="itil-section service">
                     <h6 class="fw-bold">Gerenciamento de Nivel de Servico - Avaliacoes</h6>
                 </div>
-                <div class="card shadow-sm">
+                <div class="card shadow-sm chart-card">
                     <div class="card-body">
                         <div class="chart-container"><canvas id="ratingChart"></canvas></div>
                     </div>
@@ -189,7 +190,7 @@ $trendResolved = array_map(fn($m) => (int)$m['resolved'], $monthlyTrend);
                 <div class="itil-section service">
                     <h6 class="fw-bold">Satisfacao por Categoria</h6>
                 </div>
-                <div class="card shadow-sm">
+                <div class="card shadow-sm chart-card">
                     <div class="card-body">
                         <div class="chart-container"><canvas id="categoryRatingChart"></canvas></div>
                     </div>
@@ -202,9 +203,9 @@ $trendResolved = array_map(fn($m) => (int)$m['resolved'], $monthlyTrend);
                 <div class="itil-section csi">
                     <h6 class="fw-bold">CSI - Continual Service Improvement: Performance dos Tecnicos</h6>
                 </div>
-                <div class="card shadow-sm">
+                <div class="card shadow-sm chart-card">
                     <div class="card-body">
-                        <div class="chart-container" style="height:200px"><canvas id="techChart"></canvas></div>
+                        <div class="chart-container" style="height:220px"><canvas id="techChart"></canvas></div>
                     </div>
                 </div>
             </div>
@@ -213,94 +214,142 @@ $trendResolved = array_map(fn($m) => (int)$m['resolved'], $monthlyTrend);
     </div>
 
     <script>
+    function cssVar(name) {
+        return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    }
     function isDark() { return document.documentElement.getAttribute('data-theme') === 'dark'; }
+
     function chartColors() {
-        const d = isDark();
         return {
-            text: d ? '#e0e0e0' : '#333333',
-            grid: d ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
-            bg: d ? '#1e1e1e' : '#ffffff'
+            primary: cssVar('--chart-primary'),
+            success: cssVar('--chart-success'),
+            warning: cssVar('--chart-warning'),
+            purple: cssVar('--chart-purple'),
+            cyan: cssVar('--chart-cyan'),
+            yellow: cssVar('--chart-yellow'),
+            danger: cssVar('--chart-danger'),
+            grid: cssVar('--chart-grid'),
+            text: cssVar('--chart-text'),
+            tooltipBg: cssVar('--chart-tooltip-bg'),
+            tooltipText: cssVar('--chart-tooltip-text'),
+            tooltipBorder: cssVar('--chart-tooltip-border'),
+            cardBg: cssVar('--bg-card'),
         };
     }
+
     function chartDefaults() {
         const c = chartColors();
         Chart.defaults.color = c.text;
         Chart.defaults.borderColor = c.grid;
+        Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+        Chart.defaults.font.size = 12;
+        Chart.defaults.plugins.tooltip.backgroundColor = c.tooltipBg;
+        Chart.defaults.plugins.tooltip.titleColor = c.tooltipText;
+        Chart.defaults.plugins.tooltip.bodyColor = c.tooltipText;
+        Chart.defaults.plugins.tooltip.borderColor = c.tooltipBorder;
+        Chart.defaults.plugins.tooltip.borderWidth = 1;
+        Chart.defaults.plugins.tooltip.cornerRadius = 8;
+        Chart.defaults.plugins.tooltip.padding = 10;
+        Chart.defaults.plugins.tooltip.displayColors = true;
+        Chart.defaults.plugins.tooltip.boxPadding = 4;
+        Chart.defaults.plugins.legend.labels.usePointStyle = true;
+        Chart.defaults.plugins.legend.labels.padding = 16;
     }
     chartDefaults();
 
-    const teal = 'rgba(13,110,253,0.8)';
-    const green = 'rgba(25,135,84,0.8)';
-    const orange = 'rgba(253,126,20,0.8)';
-    const colors = [teal, green, orange, 'rgba(111,66,193,0.8)', 'rgba(13,202,240,0.8)', 'rgba(255,193,7,0.8)'];
+    let charts = [];
 
-    new Chart(document.getElementById('trendChart'), {
-        type: 'bar',
-        data: {
-            labels: <?= json_encode($trendMonths) ?>,
-            datasets: [
-                { label: 'Abertos', data: <?= json_encode($trendOpened) ?>, backgroundColor: teal },
-                { label: 'Resolvidos', data: <?= json_encode($trendResolved) ?>, backgroundColor: green }
-            ]
-        },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } } }
-    });
+    function buildCharts() {
+        const c = chartColors();
+        const palette = [c.primary, c.success, c.warning, c.purple, c.cyan, c.yellow, c.danger];
 
-    new Chart(document.getElementById('statusChart'), {
-        type: 'doughnut',
-        data: {
-            labels: [<?php foreach ($ticketsByStatus as $s): ?>'<?= $s['status'] ?> (<?= $s['total'] ?>)',<?php endforeach ?>],
-            datasets: [{ data: [<?php foreach ($ticketsByStatus as $s): ?><?= $s['total'] ?>,<?php endforeach ?>], backgroundColor: ['#dc3545','#ffc107','#198754','#6c757d'] }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
-    });
+        charts.forEach(ch => ch.destroy());
+        charts = [];
 
-    new Chart(document.getElementById('categoryChart'), {
-        type: 'polarArea',
-        data: {
-            labels: [<?php foreach ($ticketsByCategory as $c): ?>'<?= $c['subcategory'] ?> (<?= $c['total'] ?>)',<?php endforeach ?>],
-            datasets: [{ data: [<?php foreach ($ticketsByCategory as $c): ?><?= $c['total'] ?>,<?php endforeach ?>], backgroundColor: colors.slice(0, <?= count($ticketsByCategory) ?>) }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
-    });
+        charts.push(new Chart(document.getElementById('trendChart'), {
+            type: 'bar',
+            data: {
+                labels: <?= json_encode($trendMonths) ?>,
+                datasets: [
+                    { label: 'Abertos', data: <?= json_encode($trendOpened) ?>, backgroundColor: c.primary, borderRadius: 4, borderSkipped: false },
+                    { label: 'Resolvidos', data: <?= json_encode($trendResolved) ?>, backgroundColor: c.success, borderRadius: 4, borderSkipped: false }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'top' } },
+                scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: c.grid } } }
+            }
+        }));
 
-    new Chart(document.getElementById('problemChart'), {
-        type: 'bar',
-        data: {
-            labels: [<?php foreach ($mostCommonProblems as $p): ?>'<?= htmlspecialchars(addslashes(substr($p['description'], 0, 30))) ?>',<?php endforeach ?>],
-            datasets: [{ label: 'Ocorrencias', data: [<?php foreach ($mostCommonProblems as $p): ?><?= $p['total'] ?>,<?php endforeach ?>], backgroundColor: orange }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false } } }
-    });
+        charts.push(new Chart(document.getElementById('statusChart'), {
+            type: 'doughnut',
+            data: {
+                labels: [<?php foreach ($ticketsByStatus as $s): ?>'<?= $s['status'] ?> (<?= $s['total'] ?>)',<?php endforeach ?>],
+                datasets: [{ data: [<?php foreach ($ticketsByStatus as $s): ?><?= $s['total'] ?>,<?php endforeach ?>], backgroundColor: [c.danger, c.warning, c.success, '#6c757d'], borderWidth: 0, hoverOffset: 6 }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'right', labels: { padding: 12 } } } }
+        }));
 
-    new Chart(document.getElementById('ratingChart'), {
-        type: 'bar',
-        data: { labels: <?= json_encode($ratingLabels) ?>, datasets: [{ label: 'Avaliacoes', data: <?= json_encode($ratingData) ?>, backgroundColor: ['#dc3545','#fd7e14','#ffc107','#198754','#0d6efd'] }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
-    });
+        charts.push(new Chart(document.getElementById('categoryChart'), {
+            type: 'polarArea',
+            data: {
+                labels: [<?php foreach ($ticketsByCategory as $c): ?>'<?= $c['subcategory'] ?> (<?= $c['total'] ?>)',<?php endforeach ?>],
+                datasets: [{ data: [<?php foreach ($ticketsByCategory as $c): ?><?= $c['total'] ?>,<?php endforeach ?>], backgroundColor: palette.slice(0, <?= count($ticketsByCategory) ?>).map(c => c.replace('0.85', '0.6')), borderWidth: 0 }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { padding: 12 } } }, scales: { r: { grid: { color: c.grid }, ticks: { display: false } } } }
+        }));
 
-    new Chart(document.getElementById('categoryRatingChart'), {
-        type: 'radar',
-        data: {
-            labels: [<?php foreach ($ratingByCategory as $c): ?>'<?= $c['subcategory'] ?>',<?php endforeach ?>],
-            datasets: [{ label: 'Media', data: [<?php foreach ($ratingByCategory as $c): ?><?= $c['avg_rating'] ?>,<?php endforeach ?>], backgroundColor: 'rgba(13,110,253,0.2)', borderColor: teal, pointBackgroundColor: teal }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 5, ticks: { stepSize: 1 } } } }
-    });
+        charts.push(new Chart(document.getElementById('problemChart'), {
+            type: 'bar',
+            data: {
+                labels: [<?php foreach ($mostCommonProblems as $p): ?>'<?= htmlspecialchars(addslashes(substr($p['description'], 0, 30))) ?>',<?php endforeach ?>],
+                datasets: [{ label: 'Ocorrencias', data: [<?php foreach ($mostCommonProblems as $p): ?><?= $p['total'] ?>,<?php endforeach ?>], backgroundColor: c.warning, borderRadius: 4, borderSkipped: false }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, indexAxis: 'y', plugins: { legend: { display: false } }, scales: { x: { beginAtZero: true, grid: { color: c.grid } }, y: { grid: { display: false } } } }
+        }));
 
-    new Chart(document.getElementById('techChart'), {
-        type: 'bar',
-        data: {
-            labels: [<?php foreach ($technicianPerf as $t): ?>'<?= htmlspecialchars(addslashes($t['resolved_by'])) ?>',<?php endforeach ?>],
-            datasets: [
-                { label: 'Resolvidos', data: [<?php foreach ($technicianPerf as $t): ?><?= $t['resolved_count'] ?>,<?php endforeach ?>], backgroundColor: teal },
-                { label: 'Media Avaliacao', data: [<?php foreach ($technicianPerf as $t): ?><?= $t['avg_rating'] ?>,<?php endforeach ?>], backgroundColor: green }
-            ]
-        },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } } }
-    });
+        charts.push(new Chart(document.getElementById('ratingChart'), {
+            type: 'bar',
+            data: {
+                labels: <?= json_encode($ratingLabels) ?>,
+                datasets: [{ label: 'Avaliacoes', data: <?= json_encode($ratingData) ?>, backgroundColor: [c.danger, c.warning, c.yellow, c.success, c.primary], borderRadius: 4, borderSkipped: false }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { beginAtZero: true, grid: { color: c.grid } } } }
+        }));
 
-    window.addEventListener('themeChanged', function() { chartDefaults(); });
+        charts.push(new Chart(document.getElementById('categoryRatingChart'), {
+            type: 'radar',
+            data: {
+                labels: [<?php foreach ($ratingByCategory as $c): ?>'<?= $c['subcategory'] ?>',<?php endforeach ?>],
+                datasets: [{ label: 'Media', data: [<?php foreach ($ratingByCategory as $c): ?><?= $c['avg_rating'] ?>,<?php endforeach ?>], backgroundColor: c.primary.replace('0.85', '0.15'), borderColor: c.primary, pointBackgroundColor: c.primary, pointBorderColor: c.cardBg, pointBorderWidth: 2, pointRadius: 4, pointHoverRadius: 6 }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 5, ticks: { stepSize: 1, backdropColor: 'transparent', color: c.text }, grid: { color: c.grid }, pointLabels: { color: c.text, font: { size: 11 } } } } }
+        }));
+
+        charts.push(new Chart(document.getElementById('techChart'), {
+            type: 'bar',
+            data: {
+                labels: [<?php foreach ($technicianPerf as $t): ?>'<?= htmlspecialchars(addslashes($t['resolved_by'])) ?>',<?php endforeach ?>],
+                datasets: [
+                    { label: 'Resolvidos', data: [<?php foreach ($technicianPerf as $t): ?><?= $t['resolved_count'] ?>,<?php endforeach ?>], backgroundColor: c.primary, borderRadius: 4, borderSkipped: false, yAxisID: 'y' },
+                    { label: 'Media Avaliacao', data: [<?php foreach ($technicianPerf as $t): ?><?= $t['avg_rating'] ?>,<?php endforeach ?>], backgroundColor: c.success, borderRadius: 4, borderSkipped: false, yAxisID: 'y1' }
+                ]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: { legend: { position: 'top' } },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { beginAtZero: true, position: 'left', grid: { color: c.grid } },
+                    y1: { beginAtZero: true, max: 5, position: 'right', grid: { drawOnChartArea: false } }
+                }
+            }
+        }));
+    }
+
+    buildCharts();
+    window.addEventListener('themeChanged', function() { chartDefaults(); buildCharts(); });
     </script>
     <script src="assets/theme.js"></script>
     <script src="assets/shortcuts.js"></script>
