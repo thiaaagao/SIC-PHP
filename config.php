@@ -2,8 +2,12 @@
 
 date_default_timezone_set('America/Sao_Paulo');
 
+$isHttps = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+    || (!empty($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443)
+    || (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === 'https');
+
 ini_set('session.cookie_httponly', 1);
-ini_set('session.cookie_secure', 0);
+ini_set('session.cookie_secure', $isHttps ? 1 : 0);
 ini_set('session.cookie_samesite', 'Lax');
 ini_set('session.use_strict_mode', 1);
 ini_set('session.use_only_cookies', 1);

@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../src/Database.php';
 require_once __DIR__ . '/../src/Auth.php';
+require_once __DIR__ . '/../src/RateLimit.php';
 require_once __DIR__ . '/../src/AuditLog.php';
 require_once __DIR__ . '/../src/NavHelper.php';
 
@@ -41,10 +42,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $user) {
     } else {
     if (isset($_POST['add_comment']) && Auth::canResolve()) {
         $comment = trim($_POST['comment'] ?? '');
-        if ($comment) {
+        $commenterId = 'user_' . $user['id'];
+        if (!RateLimit::check($commenterId, 3, 60)) {
+            $msg = 'Muitos comentarios. Aguarde 1 minuto.';
+            $msgType = 'warning';
+        } elseif ($comment) {
             $st = $db->prepare("INSERT INTO comments (ticket_id, user_id, comment) VALUES (?, ?, ?)");
             $st->execute([$ticketId, $user['id'], $comment]);
             AuditLog::log('comment_add', 'ticket', $ticketId, "Comentario adicionado por " . $user['name']);
+            RateLimit::record($commenterId);
             $msg = 'Comentario adicionado.';
         }
     }

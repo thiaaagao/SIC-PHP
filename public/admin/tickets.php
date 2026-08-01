@@ -3,6 +3,7 @@ require_once __DIR__ . '/../../config.php';
 require_once __DIR__ . '/../../src/Database.php';
 require_once __DIR__ . '/../../src/Auth.php';
 require_once __DIR__ . '/../../src/Category.php';
+require_once __DIR__ . '/../../src/AuditLog.php';
 
 session_start();
 logAccess();
@@ -20,6 +21,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
     if (isset($_POST['delete_ticket'])) {
         $ticketId = (int)($_POST['ticket_id'] ?? 0);
+        $deletePassword = $_POST['delete_password'] ?? '';
+
+        $stmtUser = $db->prepare("SELECT password FROM users WHERE id = ?");
+        $stmtUser->execute([$user['id']]);
+        $userData = $stmtUser->fetch();
+
+        if (!$userData || !password_verify($deletePassword, $userData['password'])) {
+            $msg = 'Senha incorreta. Operacao cancelada.';
+            $msgType = 'danger';
+        } else {
         $db->beginTransaction();
         try {
             $db->prepare("DELETE FROM comments WHERE ticket_id = ?")->execute([$ticketId]);
@@ -28,11 +39,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $db->prepare("DELETE FROM audit_logs WHERE entity_type = 'ticket' AND entity_id = ?")->execute([$ticketId]);
             $db->prepare("DELETE FROM tickets WHERE id = ?")->execute([$ticketId]);
             $db->commit();
+            AuditLog::log('ticket_delete', 'ticket', $ticketId, "Ticket #{$ticketId} excluido por {$user['name']}");
             $msg = "Ticket #{$ticketId} excluido.";
         } catch (Exception $e) {
             $db->rollBack();
             $msg = 'Erro ao excluir ticket.';
             $msgType = 'danger';
+        }
         }
     }
 
@@ -214,6 +227,10 @@ $statuses = ['open', 'in_progress', 'resolved', 'closed'];
             <div class="modal-body">
                 <p>Excluir permanentemente o ticket <strong><?= htmlspecialchars($t['code']) ?></strong>?</p>
                 <p class="small text-muted">Comentarios e avaliacoes vinculadas serao removidos.</p>
+                <div class="mb-3">
+                    <label class="form-label">Confirme com sua senha:</label>
+                    <input type="password" name="delete_password" class="form-control" required>
+                </div>
             </div>
             <div class="modal-footer">
                 <input type="hidden" name="ticket_id" value="<?= $t['id'] ?>">

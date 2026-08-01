@@ -25,7 +25,21 @@ if (!$att) {
 }
 
 $user = Auth::getUser();
-if (!$user || ($att['uploaded_by'] != $user['id'] && !Auth::canResolve())) {
+if (!$user) {
+    http_response_code(403);
+    echo 'Acesso negado.';
+    exit;
+}
+
+// Check user owns the ticket OR is staff
+$stmtTicket = $db->prepare("SELECT requester_name FROM tickets WHERE id = ?");
+$stmtTicket->execute([$att['ticket_id']]);
+$ticket = $stmtTicket->fetch();
+
+$isOwner = $ticket && $ticket['requester_name'] === $user['name'];
+$isStaff = Auth::canResolve();
+
+if (!$isOwner && !$isStaff) {
     http_response_code(403);
     echo 'Acesso negado.';
     exit;

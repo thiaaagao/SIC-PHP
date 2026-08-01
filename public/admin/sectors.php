@@ -142,55 +142,6 @@ $sectors = Sector::getAll();
                                             <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal<?= $s['id'] ?>">Excluir</button>
                                         </td>
                                     </tr>
-
-                                    <div class="modal fade" id="editModal<?= $s['id'] ?>" tabindex="-1">
-                                        <div class="modal-dialog">
-                                            <form method="post" class="modal-content">
-                                                <?= Auth::csrfField() ?>
-                                                <div class="modal-header">
-                                                    <h6 class="modal-title">Editar <?= htmlspecialchars($s['name']) ?></h6>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <input type="hidden" name="sector_id" value="<?= $s['id'] ?>">
-                                                    <div class="mb-3">
-                                                        <label class="form-label">Nome</label>
-                                                        <input type="text" name="name" class="form-control" value="<?= htmlspecialchars($s['name']) ?>" required>
-                                                    </div>
-                                                    <div class="form-check">
-                                                        <input type="checkbox" name="active" class="form-check-input" <?= $s['active'] ? 'checked' : '' ?>>
-                                                        <label class="form-check-label">Ativo</label>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
-                                                    <input type="hidden" name="update_sector" value="1">
-                                                    <button type="submit" class="btn btn-primary">Salvar</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-
-                                    <div class="modal fade" id="deleteModal<?= $s['id'] ?>" tabindex="-1">
-                                        <div class="modal-dialog">
-                                            <form method="post" class="modal-content">
-                                                <?= Auth::csrfField() ?>
-                                                <div class="modal-header">
-                                                    <h6 class="modal-title">Excluir <?= htmlspecialchars($s['name']) ?>?</h6>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <p>Tem certeza que deseja excluir este setor?</p>
-                                                    <input type="hidden" name="sector_id" value="<?= $s['id'] ?>">
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
-                                                    <input type="hidden" name="delete_sector" value="1">
-                                                    <button type="submit" class="btn btn-danger">Excluir</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
                                     <?php endforeach ?>
                                     <?php endif ?>
                                 </tbody>
@@ -201,6 +152,59 @@ $sectors = Sector::getAll();
             </div>
         </div>
     </div>
+
+    <?php if (!empty($sectors)): ?>
+    <?php foreach ($sectors as $s): ?>
+    <div class="modal fade" id="editModal<?= $s['id'] ?>" tabindex="-1">
+        <div class="modal-dialog">
+            <form method="post" class="modal-content">
+                <?= Auth::csrfField() ?>
+                <div class="modal-header">
+                    <h6 class="modal-title">Editar <?= htmlspecialchars($s['name']) ?></h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="sector_id" value="<?= $s['id'] ?>">
+                    <div class="mb-3">
+                        <label class="form-label">Nome</label>
+                        <input type="text" name="name" class="form-control" value="<?= htmlspecialchars($s['name']) ?>" required>
+                    </div>
+                    <div class="form-check">
+                        <input type="checkbox" name="active" class="form-check-input" <?= $s['active'] ? 'checked' : '' ?>>
+                        <label class="form-check-label">Ativo</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                    <input type="hidden" name="update_sector" value="1">
+                    <button type="submit" class="btn btn-primary">Salvar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal fade" id="deleteModal<?= $s['id'] ?>" tabindex="-1">
+        <div class="modal-dialog">
+            <form method="post" class="modal-content">
+                <?= Auth::csrfField() ?>
+                <div class="modal-header">
+                    <h6 class="modal-title">Excluir <?= htmlspecialchars($s['name']) ?>?</h6>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Tem certeza que deseja excluir este setor?</p>
+                    <input type="hidden" name="sector_id" value="<?= $s['id'] ?>">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                    <input type="hidden" name="delete_sector" value="1">
+                    <button type="submit" class="btn btn-danger">Excluir</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <?php endforeach ?>
+    <?php endif ?>
     <script src="../assets/toast.js"></script>
     <script src="../assets/app.js"></script>
     <script src="../assets/shortcuts.js"></script>

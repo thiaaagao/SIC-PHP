@@ -28,6 +28,7 @@ $actionLabels = [
     'ticket_priority' => 'Alterar Prioridade',
     'ticket_update' => 'Atualizar Ticket',
     'ticket_rate' => 'Avaliar Ticket',
+    'ticket_delete' => 'Excluir Ticket',
     'comment_add' => 'Adicionar Comentario',
     'user_delete' => 'Excluir Usuario',
     'category_create' => 'Criar Categoria',

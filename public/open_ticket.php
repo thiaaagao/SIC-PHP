@@ -2,6 +2,7 @@
 require_once __DIR__ . '/../config.php';
 require_once __DIR__ . '/../src/Database.php';
 require_once __DIR__ . '/../src/Auth.php';
+require_once __DIR__ . '/../src/RateLimit.php';
 require_once __DIR__ . '/../src/TeamsNotification.php';
 require_once __DIR__ . '/../src/EmailNotification.php';
 require_once __DIR__ . '/../src/Sector.php';
@@ -50,6 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($honeypot !== '') {
             $error = 'Erro de seguranca.';
+        } elseif (!RateLimit::check($clientIp, 3, 300)) {
+            $error = 'Muitas tentativas. Aguarde 5 minutos.';
         } elseif (empty($requesterName)) {
             $error = 'Informe seu nome.';
         } elseif (!preg_match('/^(0[1-9]|1[0-9]|2[0-5])$/', $conf)) {
@@ -62,6 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->execute([$requesterName, $subcategory, $description, $ip, $hostname, $setor, $conf, 'medium']);
             $ticketId = $db->lastInsertId();
             AuditLog::log('ticket_create', 'ticket', $ticketId, "Ticket aberto por visitante: $requesterName");
+            RateLimit::record($clientIp);
         }
     } else {
         $subcategory = $_POST['subcategory'] ?? '';

@@ -51,7 +51,7 @@ if (!in_array($body['subcategory'], $validSubs)) {
     exit;
 }
 
-$ip = $body['ip'] ?? ($_SERVER['HTTP_X_FORWARDED_FOR'] ?? $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1');
+$ip = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
 $hostname = $body['hostname'] ?? '';
 $setor = $body['setor'] ?? '';
 $conf = $body['conf'] ?? '';
