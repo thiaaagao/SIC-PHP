@@ -7,6 +7,7 @@ require_once __DIR__ . '/../src/EmailNotification.php';
 require_once __DIR__ . '/../src/AuditLog.php';
 require_once __DIR__ . '/../src/Pagination.php';
 require_once __DIR__ . '/../src/NavHelper.php';
+require_once __DIR__ . '/../src/Category.php';
 
 session_start();
 logAccess();
@@ -61,11 +62,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         AuditLog::log('ticket_assign', 'ticket', $ticketId, "Atribuido para: $assignName por " . $user['name']);
         $success = 'Atribuicao atualizada.';
     }
-    header('Location: support.php' . ($statusFilter ? "?status=$statusFilter" : ''));
+    header('Location: support.php' . ($statusFilter && in_array($statusFilter, ['open','in_progress','resolved','closed']) ? "?status=" . urlencode($statusFilter) : ''));
     exit;
 }
 
 $supportUsers = $db->query("SELECT id, name FROM users WHERE role IN ('admin', 'suporte_ti') ORDER BY name")->fetchAll();
+$allCategories = array_column(Category::getAll(), 'name');
 
 $where = "1=1";
 $params = [];
@@ -193,8 +195,8 @@ $badgeMap = ['open' => 'danger', 'in_progress' => 'warning text-dark', 'resolved
                 <div class="col-md-2">
                     <select name="category" class="form-select form-select-sm">
                         <option value="">Categoria</option>
-                        <?php foreach (['Hardware','Software','Rede','Coletor','Outros'] as $cat): ?>
-                            <option value="<?= $cat ?>" <?= $categoryFilter === $cat ? 'selected' : '' ?>><?= $cat ?></option>
+                        <?php foreach ($allCategories as $cat): ?>
+                            <option value="<?= htmlspecialchars($cat) ?>" <?= $categoryFilter === $cat ? 'selected' : '' ?>><?= htmlspecialchars($cat) ?></option>
                         <?php endforeach ?>
                     </select>
                 </div>

@@ -20,9 +20,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
     if (isset($_POST['delete_ticket'])) {
         $ticketId = (int)($_POST['ticket_id'] ?? 0);
-        $st = $db->prepare("DELETE FROM tickets WHERE id = ?");
-        $st->execute([$ticketId]);
-        $msg = "Ticket #{$ticketId} excluido.";
+        $db->beginTransaction();
+        try {
+            $db->prepare("DELETE FROM comments WHERE ticket_id = ?")->execute([$ticketId]);
+            $db->prepare("DELETE FROM ratings WHERE ticket_id = ?")->execute([$ticketId]);
+            $db->prepare("DELETE FROM ticket_attachments WHERE ticket_id = ?")->execute([$ticketId]);
+            $db->prepare("DELETE FROM audit_logs WHERE entity_type = 'ticket' AND entity_id = ?")->execute([$ticketId]);
+            $db->prepare("DELETE FROM tickets WHERE id = ?")->execute([$ticketId]);
+            $db->commit();
+            $msg = "Ticket #{$ticketId} excluido.";
+        } catch (Exception $e) {
+            $db->rollBack();
+            $msg = 'Erro ao excluir ticket.';
+            $msgType = 'danger';
+        }
     }
 
     if (isset($_POST['update_status'])) {

@@ -71,7 +71,7 @@ function logAccess(): void
     if (strpos($_SERVER['SCRIPT_FILENAME'] ?? '', 'setup.php') !== false) return;
 
     $db = Database::getInstance();
-    $userId = $_SESSION['user_id'] ?? null;
+    $userId = $_SESSION['user']['id'] ?? null;
     $page = basename($_SERVER['SCRIPT_FILENAME'] ?? 'unknown');
     $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
     $ua = substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 255);

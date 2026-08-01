@@ -43,9 +43,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($isVisitor) {
         $subcategory = 'Outros';
-        $description = 'Alerta via visitante';
-        $setor = '';
-        $honeypot = $_POST['website'] ?? '';
+            $description = 'Alerta via visitante';
+            $setor = '';
+            $priority = 'medium';
+            $honeypot = $_POST['website'] ?? '';
 
         if ($honeypot !== '') {
             $error = 'Erro de seguranca.';
