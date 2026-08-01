@@ -39,8 +39,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 Auth::changePassword($user['id'], $newPass);
                 AuditLog::log('password_change', 'user', $user['id'], "Senha alterada pelo usuario");
-                $msg = 'Senha alterada com sucesso!';
-                $msgType = 'success';
+                session_regenerate_id(true);
+                header('Location: login.php?msg=password_changed');
+                exit;
             }
         }
     }

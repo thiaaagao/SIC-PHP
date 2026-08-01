@@ -90,6 +90,9 @@ $roleUsers = ['encarregado' => 'encarregado', 'suporte_ti' => 'suporte', 'admin'
                         <?php if ($error): ?>
                             <script>document.addEventListener('DOMContentLoaded', function(){ PS.toast('<?= addslashes(htmlspecialchars($error)) ?>', 'error'); });</script>
                         <?php endif ?>
+                        <?php if (isset($_GET['msg']) && $_GET['msg'] === 'password_changed'): ?>
+                            <script>document.addEventListener('DOMContentLoaded', function(){ PS.toast('Senha alterada com sucesso! Faca login com a nova senha.', 'success', 5000); });</script>
+                        <?php endif ?>
 
                         <?php if ($roleHint && isset($roleLabels[$roleHint])): ?>
                             <div class="d-flex align-items-center justify-content-between mb-3 p-2 rounded" style="background: var(--bg-secondary, #f8f9fa);">

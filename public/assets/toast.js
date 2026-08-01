@@ -2,7 +2,7 @@ var PS = PS || {};
 
 PS.toast = function(msg, type, duration) {
     type = type || 'success';
-    duration = duration || 4000;
+    duration = duration || (type === 'error' || type === 'warning' ? 8000 : 4000);
 
     var icons = {
         success: '\u2714',
