@@ -213,32 +213,34 @@ $trendResolved = array_map(fn($m) => (int)$m['resolved'], $monthlyTrend);
 
     </div>
 
+    <script src="assets/theme.js"></script>
     <script>
-    function cssVar(name) {
-        return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+    function cssVar(name, fallback) {
+        var v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+        return v || fallback;
     }
     function isDark() { return document.documentElement.getAttribute('data-theme') === 'dark'; }
 
     function chartColors() {
         return {
-            primary: cssVar('--chart-primary'),
-            success: cssVar('--chart-success'),
-            warning: cssVar('--chart-warning'),
-            purple: cssVar('--chart-purple'),
-            cyan: cssVar('--chart-cyan'),
-            yellow: cssVar('--chart-yellow'),
-            danger: cssVar('--chart-danger'),
-            grid: cssVar('--chart-grid'),
-            text: cssVar('--chart-text'),
-            tooltipBg: cssVar('--chart-tooltip-bg'),
-            tooltipText: cssVar('--chart-tooltip-text'),
-            tooltipBorder: cssVar('--chart-tooltip-border'),
-            cardBg: cssVar('--bg-card'),
+            primary: cssVar('--chart-primary', 'rgba(13,110,253,0.85)'),
+            success: cssVar('--chart-success', 'rgba(25,135,84,0.85)'),
+            warning: cssVar('--chart-warning', 'rgba(253,126,20,0.85)'),
+            purple: cssVar('--chart-purple', 'rgba(111,66,193,0.85)'),
+            cyan: cssVar('--chart-cyan', 'rgba(13,202,240,0.85)'),
+            yellow: cssVar('--chart-yellow', 'rgba(255,193,7,0.85)'),
+            danger: cssVar('--chart-danger', 'rgba(220,53,69,0.85)'),
+            grid: cssVar('--chart-grid', 'rgba(0,0,0,0.08)'),
+            text: cssVar('--chart-text', '#555555'),
+            tooltipBg: cssVar('--chart-tooltip-bg', '#ffffff'),
+            tooltipText: cssVar('--chart-tooltip-text', '#333333'),
+            tooltipBorder: cssVar('--chart-tooltip-border', '#dee2e6'),
+            cardBg: cssVar('--bg-card', '#ffffff'),
         };
     }
 
     function chartDefaults() {
-        const c = chartColors();
+        var c = chartColors();
         Chart.defaults.color = c.text;
         Chart.defaults.borderColor = c.grid;
         Chart.defaults.font.family = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
@@ -255,16 +257,15 @@ $trendResolved = array_map(fn($m) => (int)$m['resolved'], $monthlyTrend);
         Chart.defaults.plugins.legend.labels.usePointStyle = true;
         Chart.defaults.plugins.legend.labels.padding = 16;
     }
-    chartDefaults();
 
-    let charts = [];
+    var charts = [];
 
     function buildCharts() {
-        const c = chartColors();
-        const palette = [c.primary, c.success, c.warning, c.purple, c.cyan, c.yellow, c.danger];
-
-        charts.forEach(ch => ch.destroy());
+        charts.forEach(function(ch) { ch.destroy(); });
         charts = [];
+
+        var c = chartColors();
+        var palette = [c.primary, c.success, c.warning, c.purple, c.cyan, c.yellow, c.danger];
 
         charts.push(new Chart(document.getElementById('trendChart'), {
             type: 'bar',
@@ -295,7 +296,7 @@ $trendResolved = array_map(fn($m) => (int)$m['resolved'], $monthlyTrend);
             type: 'polarArea',
             data: {
                 labels: [<?php foreach ($ticketsByCategory as $c): ?>'<?= $c['subcategory'] ?> (<?= $c['total'] ?>)',<?php endforeach ?>],
-                datasets: [{ data: [<?php foreach ($ticketsByCategory as $c): ?><?= $c['total'] ?>,<?php endforeach ?>], backgroundColor: palette.slice(0, <?= count($ticketsByCategory) ?>).map(c => c.replace('0.85', '0.6')), borderWidth: 0 }]
+                datasets: [{ data: [<?php foreach ($ticketsByCategory as $c): ?><?= $c['total'] ?>,<?php endforeach ?>], backgroundColor: palette.slice(0, <?= count($ticketsByCategory) ?>).map(function(cl) { return cl.replace('0.85', '0.6'); }), borderWidth: 0 }]
             },
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { padding: 12 } } }, scales: { r: { grid: { color: c.grid }, ticks: { display: false } } } }
         }));
@@ -348,10 +349,12 @@ $trendResolved = array_map(fn($m) => (int)$m['resolved'], $monthlyTrend);
         }));
     }
 
-    buildCharts();
-    window.addEventListener('themeChanged', function() { chartDefaults(); buildCharts(); });
+    document.addEventListener('DOMContentLoaded', function() {
+        chartDefaults();
+        buildCharts();
+        window.addEventListener('themeChanged', function() { chartDefaults(); buildCharts(); });
+    });
     </script>
-    <script src="assets/theme.js"></script>
     <script src="assets/shortcuts.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
