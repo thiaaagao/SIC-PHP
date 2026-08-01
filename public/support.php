@@ -323,6 +323,7 @@ $badgeMap = ['open' => 'danger', 'in_progress' => 'warning text-dark', 'resolved
         </div>
         <?php endif ?>
     </div>
+    <script src="assets/theme.js"></script>
     <script src="assets/toast.js"></script>
     <script src="assets/shortcuts.js"></script>
     <script src="assets/app.js"></script>
