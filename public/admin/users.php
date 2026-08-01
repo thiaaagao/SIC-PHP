@@ -209,6 +209,9 @@ $statusMap = [
                         </tr>
                     </thead>
                     <tbody>
+                        <?php if (empty($users)): ?>
+                        <tr><td colspan="8" class="text-center py-4 text-muted">Nenhum usuario encontrado.</td></tr>
+                        <?php else: ?>
                         <?php foreach ($users as $u):
                             $st = $statusMap[$u['status']] ?? $statusMap['active'];
                             $isLocked = $u['status'] === 'locked' && $u['locked_until'] && strtotime($u['locked_until']) > time();
@@ -278,6 +281,7 @@ $statusMap = [
                             </td>
                         </tr>
                         <?php endforeach ?>
+                        <?php endif ?>
                     </tbody>
                 </table>
             </div>

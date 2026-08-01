@@ -44,22 +44,30 @@ if ($action === 'csv') {
 
     fputcsv($output, ['Codigo', 'Solicitante', 'Subcategoria', 'Prioridade', 'Setor', 'Conf', 'Hostname', 'IP', 'Status', 'SLA (h)', 'Atribuido', 'Criado em', 'Resolvido em'], ';');
 
+    function sanitizeCsv($val) {
+        $s = (string) $val;
+        if (strlen($s) > 0 && in_array($s[0], ['=', '+', '-', '@', "\t", "\r"])) {
+            $s = "'" . $s;
+        }
+        return $s;
+    }
+
     foreach ($tickets as $t) {
         $sla = round((strtotime($t['resolved_at'] ?: 'now') - strtotime($t['created_at'])) / 3600, 1);
         fputcsv($output, [
-            $t['code'],
-            $t['requester_name'],
-            $t['subcategory'],
-            $t['priority'] ?? 'medium',
-            $t['setor'],
-            $t['conf'],
-            $t['hostname'],
-            $t['ip'],
-            $t['status'],
-            $sla,
-            $t['assigned_name'] ?? '',
-            $t['created_at'],
-            $t['resolved_at'] ?? ''
+            sanitizeCsv($t['code']),
+            sanitizeCsv($t['requester_name']),
+            sanitizeCsv($t['subcategory']),
+            sanitizeCsv($t['priority'] ?? 'medium'),
+            sanitizeCsv($t['setor']),
+            sanitizeCsv($t['conf']),
+            sanitizeCsv($t['hostname']),
+            sanitizeCsv($t['ip']),
+            sanitizeCsv($t['status']),
+            sanitizeCsv($sla),
+            sanitizeCsv($t['assigned_name'] ?? ''),
+            sanitizeCsv($t['created_at']),
+            sanitizeCsv($t['resolved_at'] ?? '')
         ], ';');
     }
 
@@ -75,14 +83,15 @@ if ($action === 'csv') {
     <title>Exportar Relatorios</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="../assets/theme.css" rel="stylesheet">
+    <link href="../assets/toast.css" rel="stylesheet">
 </head>
 <body>
-    <nav class="navbar navbar-expand bg-primary navbar-dark">
+    <nav class="navbar navbar-expand bg-dark navbar-dark">
         <div class="container">
             <span class="navbar-brand fw-bold">Exportar Relatorios</span>
             <div class="ms-auto d-flex gap-2 align-items-center">
-                <a href="../support.php" class="btn btn-outline-light btn-sm">Suporte</a>
                 <a href="index.php" class="btn btn-outline-light btn-sm">Admin</a>
+                <a href="tickets.php" class="btn btn-outline-light btn-sm">Tickets</a>
                 <button id="themeToggle" class="btn-theme-toggle" title="Alternar tema"></button>
             </div>
         </div>
@@ -123,6 +132,7 @@ if ($action === 'csv') {
             </div>
         </div>
     </div>
+    <script src="../assets/toast.js"></script>
     <script src="../assets/theme.js"></script>
     <script src="../assets/shortcuts.js"></script>
 </body>

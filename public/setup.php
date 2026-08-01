@@ -48,10 +48,14 @@ $checks['apache'] = ['status' => 'ok', 'msg' => 'Apache rodando na porta 8080'];
     <title>Setup - S.I.C.</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 <link href="assets/theme.css" rel="stylesheet">
+<link href="assets/toast.css" rel="stylesheet">
 </head>
 <body>
     <div class="container py-5">
-        <h3 class="mb-4">Setup - S.I.C.</h3>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="mb-0">Setup - S.I.C.</h3>
+            <button id="themeToggle" class="btn-theme-toggle" title="Alternar tema"></button>
+        </div>
 
         <?php foreach ($checks as $key => $c): ?>
             <div class="alert alert-<?= $c['status'] === 'ok' ? 'success' : ($c['status'] === 'warning' ? 'warning' : 'danger') ?> py-2">
@@ -88,6 +92,7 @@ $checks['apache'] = ['status' => 'ok', 'msg' => 'Apache rodando na porta 8080'];
             <a href="open_ticket.php" class="btn btn-outline-primary">Abrir P.S.</a>
         </div>
     </div>
+    <script src="assets/toast.js"></script>
     <script src="assets/theme.js"></script>
 </body>
 </html>

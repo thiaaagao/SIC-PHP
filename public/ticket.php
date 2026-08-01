@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $user) {
             $msg = 'Comentario adicionado.';
         }
     }
-    if (isset($_POST['add_rating']) && $isTicketCreator && $ticket['status'] === 'resolved') {
+    if (isset($_POST['add_rating']) && $isTicketCreator && $ticket['status'] === 'resolved' && !$userRating) {
         $rating = (int) ($_POST['rating'] ?? 0);
         if ($rating >= 1 && $rating <= 5) {
             $st = $db->prepare("INSERT INTO ratings (ticket_id, user_id, rating) VALUES (?, ?, ?)");

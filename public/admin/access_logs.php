@@ -26,6 +26,7 @@ $logs = $stmt->fetchAll();
     <title>Logs de Acesso - Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="../assets/theme.css" rel="stylesheet">
+    <link href="../assets/toast.css" rel="stylesheet">
 </head>
 <body>
     <nav class="navbar navbar-expand bg-dark navbar-dark">
@@ -58,6 +59,9 @@ $logs = $stmt->fetchAll();
                             </tr>
                         </thead>
                         <tbody>
+                            <?php if (empty($logs)): ?>
+                            <tr><td colspan="5" class="text-center py-4 text-muted">Nenhum registro de acesso.</td></tr>
+                            <?php else: ?>
                             <?php foreach ($logs as $log): ?>
                             <tr>
                                 <td class="text-nowrap"><?= date('d/m/Y H:i:s', strtotime($log['created_at'])) ?></td>
@@ -67,6 +71,7 @@ $logs = $stmt->fetchAll();
                                 <td><small><?= htmlspecialchars($log['user_agent']) ?></small></td>
                             </tr>
                             <?php endforeach ?>
+                            <?php endif ?>
                         </tbody>
                     </table>
                 </div>
@@ -79,6 +84,7 @@ $logs = $stmt->fetchAll();
             <?php endif ?>
         </div>
     </div>
+    <script src="../assets/toast.js"></script>
     <script src="../assets/theme.js"></script>
     <script src="../assets/shortcuts.js"></script>
 </body>

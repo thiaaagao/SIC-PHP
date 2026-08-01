@@ -50,6 +50,7 @@ $trendResolved = array_map(fn($m) => (int)$m['resolved'], $monthlyTrend);
     <title>ITIL Analytics - S.I.C.</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/theme.css" rel="stylesheet">
+    <link href="assets/toast.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
     <style>
         .chart-container { position: relative; height: 280px; }
@@ -286,7 +287,7 @@ $trendResolved = array_map(fn($m) => (int)$m['resolved'], $monthlyTrend);
         charts.push(new Chart(document.getElementById('statusChart'), {
             type: 'doughnut',
             data: {
-                labels: [<?php foreach ($ticketsByStatus as $s): ?>'<?= $s['status'] ?> (<?= $s['total'] ?>)',<?php endforeach ?>],
+                labels: [<?php foreach ($ticketsByStatus as $s): ?><?= json_encode($s['status'] . ' (' . $s['total'] . ')') ?>,<?php endforeach ?>],
                 datasets: [{ data: [<?php foreach ($ticketsByStatus as $s): ?><?= $s['total'] ?>,<?php endforeach ?>], backgroundColor: [c.danger, c.warning, c.success, '#6c757d'], borderWidth: 0, hoverOffset: 6 }]
             },
             options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'right', labels: { padding: 12 } } } }
@@ -295,7 +296,7 @@ $trendResolved = array_map(fn($m) => (int)$m['resolved'], $monthlyTrend);
         charts.push(new Chart(document.getElementById('categoryChart'), {
             type: 'polarArea',
             data: {
-                labels: [<?php foreach ($ticketsByCategory as $c): ?>'<?= $c['subcategory'] ?> (<?= $c['total'] ?>)',<?php endforeach ?>],
+                labels: [<?php foreach ($ticketsByCategory as $c): ?><?= json_encode($c['subcategory'] . ' (' . $c['total'] . ')') ?>,<?php endforeach ?>],
                 datasets: [{ data: [<?php foreach ($ticketsByCategory as $c): ?><?= $c['total'] ?>,<?php endforeach ?>], backgroundColor: palette.slice(0, <?= count($ticketsByCategory) ?>).map(function(cl) { return cl.replace('0.85', '0.6'); }), borderWidth: 0 }]
             },
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right', labels: { padding: 12 } } }, scales: { r: { grid: { color: c.grid }, ticks: { display: false } } } }
@@ -322,7 +323,7 @@ $trendResolved = array_map(fn($m) => (int)$m['resolved'], $monthlyTrend);
         charts.push(new Chart(document.getElementById('categoryRatingChart'), {
             type: 'radar',
             data: {
-                labels: [<?php foreach ($ratingByCategory as $c): ?>'<?= $c['subcategory'] ?>',<?php endforeach ?>],
+                labels: [<?php foreach ($ratingByCategory as $c): ?><?= json_encode($c['subcategory']) ?>,<?php endforeach ?>],
                 datasets: [{ label: 'Media', data: [<?php foreach ($ratingByCategory as $c): ?><?= $c['avg_rating'] ?>,<?php endforeach ?>], backgroundColor: c.primary.replace('0.85', '0.15'), borderColor: c.primary, pointBackgroundColor: c.primary, pointBorderColor: c.cardBg, pointBorderWidth: 2, pointRadius: 4, pointHoverRadius: 6 }]
             },
             options: { responsive: true, maintainAspectRatio: false, scales: { r: { min: 0, max: 5, ticks: { stepSize: 1, backdropColor: 'transparent', color: c.text }, grid: { color: c.grid }, pointLabels: { color: c.text, font: { size: 11 } } } } }
@@ -331,7 +332,7 @@ $trendResolved = array_map(fn($m) => (int)$m['resolved'], $monthlyTrend);
         charts.push(new Chart(document.getElementById('techChart'), {
             type: 'bar',
             data: {
-                labels: [<?php foreach ($technicianPerf as $t): ?>'<?= htmlspecialchars(addslashes($t['resolved_by'])) ?>',<?php endforeach ?>],
+                labels: [<?php foreach ($technicianPerf as $t): ?><?= json_encode($t['resolved_by']) ?>,<?php endforeach ?>],
                 datasets: [
                     { label: 'Resolvidos', data: [<?php foreach ($technicianPerf as $t): ?><?= $t['resolved_count'] ?>,<?php endforeach ?>], backgroundColor: c.primary, borderRadius: 4, borderSkipped: false, yAxisID: 'y' },
                     { label: 'Media Avaliacao', data: [<?php foreach ($technicianPerf as $t): ?><?= $t['avg_rating'] ?>,<?php endforeach ?>], backgroundColor: c.success, borderRadius: 4, borderSkipped: false, yAxisID: 'y1' }
@@ -355,6 +356,7 @@ $trendResolved = array_map(fn($m) => (int)$m['resolved'], $monthlyTrend);
         window.addEventListener('themeChanged', function() { chartDefaults(); buildCharts(); });
     });
     </script>
+    <script src="assets/toast.js"></script>
     <script src="assets/shortcuts.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>

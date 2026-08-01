@@ -22,11 +22,12 @@ class Pagination
         if ($totalPages <= 1) return '';
 
         $sep = str_contains($baseUrl, '?') ? '&' : '?';
+        $safeUrl = htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8');
         $html = '<nav><ul class="pagination pagination-sm mb-0 justify-content-center">';
 
         if ($currentPage > 1) {
-            $html .= '<li class="page-item"><a class="page-link" href="' . $baseUrl . $sep . 'page=1">&laquo;</a></li>';
-            $html .= '<li class="page-item"><a class="page-link" href="' . $baseUrl . $sep . 'page=' . ($currentPage - 1) . '">&lsaquo;</a></li>';
+            $html .= '<li class="page-item"><a class="page-link" href="' . $safeUrl . $sep . 'page=1">&laquo;</a></li>';
+            $html .= '<li class="page-item"><a class="page-link" href="' . $safeUrl . $sep . 'page=' . ($currentPage - 1) . '">&lsaquo;</a></li>';
         }
 
         $start = max(1, $currentPage - 2);
@@ -38,7 +39,7 @@ class Pagination
 
         for ($i = $start; $i <= $end; $i++) {
             $active = $i === $currentPage ? ' active' : '';
-            $html .= '<li class="page-item' . $active . '"><a class="page-link" href="' . $baseUrl . $sep . 'page=' . $i . '">' . $i . '</a></li>';
+            $html .= '<li class="page-item' . $active . '"><a class="page-link" href="' . $safeUrl . $sep . 'page=' . $i . '">' . $i . '</a></li>';
         }
 
         if ($end < $totalPages) {
@@ -46,8 +47,8 @@ class Pagination
         }
 
         if ($currentPage < $totalPages) {
-            $html .= '<li class="page-item"><a class="page-link" href="' . $baseUrl . $sep . 'page=' . ($currentPage + 1) . '">&rsaquo;</a></li>';
-            $html .= '<li class="page-item"><a class="page-link" href="' . $baseUrl . $sep . 'page=' . $totalPages . '">&raquo;</a></li>';
+            $html .= '<li class="page-item"><a class="page-link" href="' . $safeUrl . $sep . 'page=' . ($currentPage + 1) . '">&rsaquo;</a></li>';
+            $html .= '<li class="page-item"><a class="page-link" href="' . $safeUrl . $sep . 'page=' . $totalPages . '">&raquo;</a></li>';
         }
 
         $html .= '</ul></nav>';

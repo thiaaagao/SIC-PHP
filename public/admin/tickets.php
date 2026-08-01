@@ -172,7 +172,7 @@ $statuses = ['open', 'in_progress', 'resolved', 'closed'];
                         <label class="form-label">Subcategoria</label>
                         <select name="subcategory" class="form-select">
                             <?php foreach ($subcategories as $s): ?>
-                                <option value="<?= $s ?>" <?= $t['subcategory'] === $s ? 'selected' : '' ?>><?= $s ?></option>
+                                <option value="<?= htmlspecialchars($s) ?>" <?= $t['subcategory'] === $s ? 'selected' : '' ?>><?= htmlspecialchars($s) ?></option>
                             <?php endforeach ?>
                         </select>
                     </div>

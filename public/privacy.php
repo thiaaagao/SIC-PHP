@@ -6,6 +6,7 @@
     <title>Politica de Privacidade - S.I.C.</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="assets/theme.css" rel="stylesheet">
+    <link href="assets/toast.css" rel="stylesheet">
 </head>
 <body>
     <nav class="navbar navbar-expand navbar-dark bg-secondary">
@@ -77,9 +78,13 @@
 
                 <hr>
                 <p class="text-muted small">Ultima atualizacao: <?= date('d/m/Y') ?></p>
+                <div class="text-center mt-3">
+                    <button id="themeToggle" class="btn-theme-toggle" title="Alternar tema"></button>
+                </div>
             </div>
         </div>
     </div>
+    <script src="assets/toast.js"></script>
     <script src="assets/theme.js"></script>
 </body>
 </html>

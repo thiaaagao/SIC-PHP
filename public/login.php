@@ -69,6 +69,7 @@ $roleUsers = ['encarregado' => 'encarregado', 'suporte_ti' => 'suporte', 'admin'
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - S.I.C.</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/theme.css" rel="stylesheet">
     <link href="assets/toast.css" rel="stylesheet">
     <style>
         .role-btn { border: 2px solid transparent; transition: all 0.2s ease; }
@@ -137,10 +138,14 @@ $roleUsers = ['encarregado' => 'encarregado', 'suporte_ti' => 'suporte', 'admin'
                 <div class="text-center mt-3">
                     <a href="open_ticket.php" class="text-decoration-none small">Abrir P.S. sem login</a>
                 </div>
+                <div class="text-center mt-3">
+                    <button id="themeToggle" class="btn-theme-toggle" title="Alternar tema"></button>
+                </div>
             </div>
         </div>
     </div>
     <script src="assets/toast.js"></script>
     <script src="assets/app.js"></script>
+    <script src="assets/theme.js"></script>
 </body>
 </html>

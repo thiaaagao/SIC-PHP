@@ -25,9 +25,12 @@ $assignedFilter = $_GET['assigned'] ?? '';
 $dateFrom = $_GET['date_from'] ?? '';
 $dateTo = $_GET['date_to'] ?? '';
 
+$error = '';
+$success = '';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!Auth::validateCsrf()) {
-        $success = 'Token CSRF invalido.';
+        $error = 'Token CSRF invalido.';
     } elseif (isset($_POST['close_ticket'])) {
         $ticketId = (int) ($_POST['ticket_id'] ?? 0);
         $resolvedBy = $user['name'];
@@ -165,8 +168,11 @@ $badgeMap = ['open' => 'danger', 'in_progress' => 'warning text-dark', 'resolved
         <a href="index.php" class="btn btn-outline-secondary btn-sm mb-3">&larr; Voltar</a>
         <h4 class="mb-3">Todos os P.S.</h4>
 
-        <?php if (isset($success)): ?>
+        <?php if ($success): ?>
             <script>document.addEventListener('DOMContentLoaded', function(){ PS.toast('<?= addslashes(htmlspecialchars($success)) ?>', 'success'); });</script>
+        <?php endif ?>
+        <?php if ($error): ?>
+            <script>document.addEventListener('DOMContentLoaded', function(){ PS.toast('<?= addslashes(htmlspecialchars($error)) ?>', 'error'); });</script>
         <?php endif ?>
 
         <form method="get" class="mb-3">

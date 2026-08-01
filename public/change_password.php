@@ -64,6 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="text-center mb-4">
                     <h3 class="fw-bold">S.I.C.</h3>
                     <p class="text-warning">Voce deve alterar sua senha para continuar</p>
+                    <button id="themeToggle" class="btn-theme-toggle" title="Alternar tema"></button>
                 </div>
                 <div class="card shadow">
                     <div class="card-body p-4">

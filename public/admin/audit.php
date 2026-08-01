@@ -46,6 +46,7 @@ $actionLabels = [
     <title>Auditoria - Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="../assets/theme.css" rel="stylesheet">
+    <link href="../assets/toast.css" rel="stylesheet">
 </head>
 <body>
     <nav class="navbar navbar-expand bg-danger navbar-dark">
@@ -109,6 +110,7 @@ $actionLabels = [
             <?php endif ?>
         </div>
     </div>
+    <script src="../assets/toast.js"></script>
     <script src="../assets/theme.js"></script>
     <script src="../assets/shortcuts.js"></script>
 </body>
