@@ -30,6 +30,8 @@ $stmtRating->execute([$ticketId]);
 $ratings = $stmtRating->fetchAll();
 $userRating = $user ? current(array_filter($ratings, fn($r) => $r['user_id'] == $user['id'])) : null;
 
+$isTicketCreator = $user && $user['name'] === $ticket['requester_name'];
+
 $avgRating = count($ratings) > 0 ? round(array_sum(array_column($ratings, 'rating')) / count($ratings), 1) : null;
 
 $msg = '';
@@ -46,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $user) {
             $msg = 'Comentario adicionado.';
         }
     }
-    if (isset($_POST['add_rating']) && Auth::canEvaluate() && $ticket['status'] === 'resolved') {
+    if (isset($_POST['add_rating']) && $isTicketCreator && $ticket['status'] === 'resolved') {
         $rating = (int) ($_POST['rating'] ?? 0);
         if ($rating >= 1 && $rating <= 5) {
             $st = $db->prepare("INSERT INTO ratings (ticket_id, user_id, rating) VALUES (?, ?, ?)");
@@ -260,7 +262,7 @@ $badgeMap = ['open' => 'danger', 'in_progress' => 'warning text-dark', 'resolved
                     </div>
                 </div>
 
-                <?php if ($user && Auth::canEvaluate() && $ticket['status'] === 'resolved' && !$userRating): ?>
+                <?php if ($isTicketCreator && $ticket['status'] === 'resolved' && !$userRating): ?>
                 <div class="card shadow-sm mb-4">
                     <div class="card-body">
                         <h6>Avaliar Resolucao</h6>
