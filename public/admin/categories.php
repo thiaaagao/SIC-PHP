@@ -116,6 +116,7 @@ foreach ($categories as $cat) {
     <title>Categorias - Admin</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="../assets/theme.css" rel="stylesheet">
+    <link href="../assets/toast.css" rel="stylesheet">
 </head>
 <body>
     <nav class="navbar navbar-expand bg-dark navbar-dark">

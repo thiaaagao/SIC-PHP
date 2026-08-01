@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!$error) {
                 if (Auth::login($username, $password)) {
                     RateLimit::clear($clientIp);
-                    AuditLog::log('login', 'user', $_SESSION['user_id'] ?? null, "Login bem-sucedido: $username");
+                    AuditLog::log('login', 'user', $_SESSION['user']['id'] ?? null, "Login bem-sucedido: $username");
                     $role = Auth::getRole();
                     header('Location: ' . ($role === 'encarregado' ? 'index.php' : 'support.php'));
                     exit;

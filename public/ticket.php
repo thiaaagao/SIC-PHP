@@ -15,7 +15,7 @@ $user = Auth::getUser();
 $ticketId = (int) ($_GET['id'] ?? 0);
 if (!$ticketId) { header('Location: index.php'); exit; }
 
-$stmt = $db->prepare("SELECT * FROM tickets WHERE id = ?");
+$stmt = $db->prepare("SELECT t.*, u.name as assigned_name FROM tickets t LEFT JOIN users u ON t.assigned_to = u.id WHERE t.id = ?");
 $stmt->execute([$ticketId]);
 $ticket = $stmt->fetch();
 
@@ -279,7 +279,7 @@ $badgeMap = ['open' => 'danger', 'in_progress' => 'warning text-dark', 'resolved
                 </div>
                 <?php endif ?>
 
-                <?php if ($user && Auth::canResolve() && $ticket['status'] === 'resolved'): ?>
+                <?php if ($user && Auth::canResolve() && $ticket['status'] !== 'closed'): ?>
                 <div class="card shadow-sm mb-4">
                     <div class="card-body">
                         <h6>Comentar</h6>
