@@ -176,7 +176,7 @@ $badgeMap = ['open' => 'danger', 'in_progress' => 'warning text-dark', 'resolved
         <div class="row justify-content-center">
             <div class="col-md-8">
 
-                <?php if ($msg): ?><script>document.addEventListener('DOMContentLoaded', function(){ PS.toast('<?= addslashes(htmlspecialchars($msg)) ?>', 'success'); });</script><?php endif ?>
+                <?php if ($msg): ?><script>document.addEventListener('DOMContentLoaded', function(){ PS.toast('<?= addslashes(htmlspecialchars($msg)) ?>', '<?= $msgType ?>'); });</script><?php endif ?>
 
                 <?php
                 $priorityMap = ['low' => 'info', 'medium' => 'secondary', 'high' => 'warning text-dark', 'critical' => 'danger'];

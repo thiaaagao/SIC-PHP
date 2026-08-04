@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $msgType = 'warning';
             } else {
                 Sector::create($name);
-                AuditLog::log('category_create', 'sector', null, "Setor criado: $name");
+                AuditLog::log('sector_create', 'sector', null, "Setor criado: $name");
                 $msg = "Setor '$name' criado.";
             }
         } else {
@@ -41,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $active = isset($_POST['active']);
         if ($id && $name) {
             Sector::update($id, $name, $active);
-            AuditLog::log('category_update', 'sector', $id, "Setor atualizado: $name");
+            AuditLog::log('sector_update', 'sector', $id, "Setor atualizado: $name");
             $msg = 'Setor atualizado.';
         }
     } elseif (isset($_POST['delete_sector'])) {
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $sector = Sector::getById($id);
             if ($sector) {
                 Sector::delete($id);
-                AuditLog::log('category_delete', 'sector', $id, "Setor excluido: {$sector['name']}");
+                AuditLog::log('sector_delete', 'sector', $id, "Setor excluido: {$sector['name']}");
                 $msg = "Setor '{$sector['name']}' excluido.";
             }
         }

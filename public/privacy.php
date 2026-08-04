@@ -78,9 +78,6 @@
 
                 <hr>
                 <p class="text-muted small">Ultima atualizacao: <?= date('d/m/Y') ?></p>
-                <div class="text-center mt-3">
-                    <button id="themeToggle" class="btn-theme-toggle" title="Alternar tema"></button>
-                </div>
             </div>
         </div>
     </div>

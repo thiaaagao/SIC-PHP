@@ -53,8 +53,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $st->execute([$ticketId, $user['id'], $comment]);
                 }
                 AuditLog::log('ticket_resolve', 'ticket', $ticketId, "Ticket {$ticket['code']} resolvido por " . $user['name']);
+                $success = "P.S. {$ticket['code']} resolvido.";
             }
-            $success = "P.S. {$ticket['code']} resolvido.";
         }
     } elseif (isset($_POST['assign_ticket'])) {
         $assignId = (int) $_POST['assign_to'];

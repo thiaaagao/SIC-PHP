@@ -37,6 +37,9 @@ $actionLabels = [
     'subcategory_create' => 'Criar Subcategoria',
     'subcategory_update' => 'Atualizar Subcategoria',
     'subcategory_delete' => 'Excluir Subcategoria',
+    'sector_create' => 'Criar Setor',
+    'sector_update' => 'Atualizar Setor',
+    'sector_delete' => 'Excluir Setor',
 ];
 ?>
 <!DOCTYPE html>
